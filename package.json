@@ -1,0 +1,32 @@
+{
+  "name": "hypnogram-card",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "A custom Home Assistant card to display a sleep hypnogram.",
+  "keywords": [
+    "home-assistant",
+    "homeassistant",
+    "lovelace",
+    "custom-card",
+    "sleep",
+    "hypnogram"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c --watch"
+  },
+  "author": "Cson",
+  "license": "MIT",
+  "dependencies": {
+    "custom-card-helpers": "^2.0.0",
+    "lit": "^3.1.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.2",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "rollup": "^4.14.0",
+    "tslib": "^2.6.2",
+    "typescript": "^6.0.3"
+  }
+}
