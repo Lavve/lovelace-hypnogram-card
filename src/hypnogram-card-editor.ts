@@ -1,8 +1,9 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import { html, LitElement, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
-import { editorStyles } from './styles'
-import type { HypnogramCardConfig } from './types'
+import { localize } from '@/localize'
+import { editorStyles } from '@/styles'
+import type { HypnogramCardConfig } from '@/types'
 
 @customElement('hypnogram-card-editor')
 export class HypnogramCardEditor extends LitElement {
@@ -13,11 +14,22 @@ export class HypnogramCardEditor extends LitElement {
     this._config = config
   }
 
-  private get _sensorEntities(): string[] {
-    if (!this.hass) return []
-    return Object.keys(this.hass.states).filter((eid) =>
-      eid.startsWith('sensor.'),
-    )
+  private get _schema() {
+    const entities = Object.keys(this.hass.states)
+      .filter((eid) => eid.startsWith('sensor.'))
+      .sort()
+
+    return [
+      {
+        name: 'title',
+        selector: { text: {} },
+      },
+      {
+        name: 'entity',
+        required: true,
+        selector: { entity: { include_entities: entities } },
+      },
+    ]
   }
 
   protected render(): TemplateResult {
@@ -25,50 +37,30 @@ export class HypnogramCardEditor extends LitElement {
       return html``
     }
 
-    return html`
-      <div class="card-config">
-        <!-- Rubrik-fält -->
-        <ha-textfield
-          label="Title (Optional)"
-          .value=${this._config.title || ''}
-          .configValue=${'title'}
-          @input=${this._valueChanged}
-        ></ha-textfield>
+    const computeLabel = (schema: any) => {
+      if (schema.name === 'title')
+        return localize('editor.title_label', this.hass)
+      if (schema.name === 'entity')
+        return localize('editor.entity_label', this.hass)
+      return schema.name
+    }
 
-        <!-- Entitets-väljare (Rullista med alla sensorer) -->
-        <ha-combo-box
-          label="Sleep data entity (Required)"
-          .hass=${this.hass}
-          .items=${this._sensorEntities}
-          .value=${this._config.entity || ''}
-          .configValue=${'entity'}
-          @value-changed=${this._valueChanged}
-          allow-custom-value
-        ></ha-combo-box>
-      </div>
+    return html`
+      <ha-form
+        .hass=${this.hass}
+        .data=${this._config}
+        .schema=${this._schema}
+        .computeLabel=${computeLabel}
+        @value-changed=${this._valueChanged}
+      ></ha-form>
     `
   }
 
-  private _valueChanged(ev: CustomEvent | Event): void {
-    if (!this._config || !this.hass) return
-
-    const target = ev.target as any
-    const configValue = target.configValue
-
-    const newValue =
-      target.value !== undefined
-        ? target.value
-        : (ev as CustomEvent).detail.value
-
-    if (this._config[configValue] === newValue) return
-
-    const newConfig = {
-      ...this._config,
-      [configValue]: newValue,
-    }
+  private _valueChanged(ev: CustomEvent): void {
+    const config = ev.detail.value
 
     const event = new CustomEvent('config-changed', {
-      detail: { config: newConfig },
+      detail: { config },
       bubbles: true,
       composed: true,
     })
