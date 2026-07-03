@@ -13,7 +13,9 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "watch": "rollup -c --watch"
+    "watch": "rollup -c --watch",
+    "format": "pnpm biome format --write .",
+    "lint": "pnpm biome check ."
   },
   "author": "Cson",
   "license": "MIT",
