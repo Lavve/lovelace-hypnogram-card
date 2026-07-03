@@ -4,8 +4,17 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   type: string
   entity: string
   title?: string
-  state_mapping?: Record<string, string>
+  debug?: boolean
+  state_mapping?: HypnogramCardStateMapping
 }
+
+export interface HaFormSchemaField {
+  name: string
+  required?: boolean
+  selector: Record<string, unknown>
+}
+
+export type SleepPhase = 'awake' | 'rem' | 'light_sleep' | 'deep_sleep'
 
 export interface HypnogramCardStateMapping {
   deep_sleep: string
@@ -14,9 +23,22 @@ export interface HypnogramCardStateMapping {
   awake: string
 }
 
+export interface SleepIntegrationPreset {
+  phases: readonly SleepPhase[]
+  phaseLevels: Record<SleepPhase, number>
+  stateMapping: HypnogramCardStateMapping
+  tracking: {
+    started: string
+    stopped: string
+  }
+}
+
 export interface HistoryState {
-  s: string
-  t: number
+  s?: string
+  state?: string
+  lu?: number
+  lc?: number
+  last_changed?: string
 }
 
 export interface SleepDataPoint {
@@ -38,7 +60,28 @@ export interface ProcessedSleepHistory {
   periodEnd: Date
 }
 
-export type SleepPhase = 'awake' | 'rem' | 'light_sleep' | 'deep_sleep'
+export interface HistoryFetchReport {
+  startTime: string
+  hoursAgo: number
+  responseKeys: string[]
+  rawCount: number
+  uniqueRawStates: string[]
+  firstEntry?: HistoryState
+  lastEntry?: HistoryState
+}
+
+export interface HistoryProcessReport {
+  stateMapping: HypnogramCardStateMapping
+  reverseMapping: Record<string, string>
+  normalizedCount: number
+  droppedCount: number
+  uniqueStates: string[]
+  sleepWindow: { startIndex: number; stopIndex: number }
+  phasePoints: number
+  periodStart?: string
+  periodEnd?: string
+  warnings: string[]
+}
 
 export interface ChartPadding {
   top: number

@@ -11,4 +11,5 @@ export default {
   // Editor
   'editor.title_label': 'Titel (Valfri)',
   'editor.entity_label': 'Sömndata Entitet (Krav)',
+  'editor.debug_label': 'Felsökning (webbläsarkonsol)',
 }

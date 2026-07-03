@@ -1,3 +1,8 @@
 {
-  "gitlens.enabled": false
+  "gitlens.enabled": false,
+  "gitlens.currentLine.enabled": false,
+  "gitlens.codeLens.enabled": false,
+  "gitlens.hovers.enabled": false,
+  "gitlens.statusBar.enabled": false,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

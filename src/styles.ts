@@ -34,10 +34,24 @@ export const chartStyles = css`
     display: block;
     width: 100%;
   }
+  .chart-container {
+    position: relative;
+    width: 100%;
+  }
   .chart {
     width: 100%;
     height: auto;
     display: block;
+  }
+  .empty-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-text-color);
+    font-size: 0.9em;
+    pointer-events: none;
   }
   .phase-label {
     fill: var(--primary-text-color);
@@ -51,14 +65,6 @@ export const chartStyles = css`
   .grid-line {
     stroke: var(--divider-color, rgba(255, 255, 255, 0.1));
     stroke-width: 0.5;
-  }
-  .empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 150px;
-    color: var(--secondary-text-color);
-    font-size: 0.9em;
   }
 `
 

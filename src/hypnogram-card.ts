@@ -2,12 +2,13 @@ import type { HomeAssistant } from 'custom-card-helpers'
 import { html, LitElement, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import '@/components/hypnogram-chart'
-import { DEFAULT_STATE_MAPPING } from '@/const'
+import { CARD_NAME, CARD_VERSION, DEFAULT_STATE_MAPPING } from '@/const'
 import '@/hypnogram-card-editor'
 import { localize } from '@/localize'
 import { fetchSleepHistory, processSleepHistory } from '@/services/history'
 import { cardStyles } from '@/styles'
 import type { HypnogramCardConfig, ProcessedSleepHistory } from '@/types'
+import { logCardBanner, logHistoryReport } from '@/utils/debug'
 import { buildSleepSegments } from '@/utils/segments'
 
 const EMPTY_HISTORY: ProcessedSleepHistory = {
@@ -36,6 +37,8 @@ export class HypnogramCard extends LitElement {
     }
   }
 
+  private _fetchGeneration = 0
+
   public setConfig(config: HypnogramCardConfig): void {
     if (!config.entity) {
       throw new Error('You must define an entity')
@@ -46,8 +49,8 @@ export class HypnogramCard extends LitElement {
     }
   }
 
-  protected willUpdate(changedProperties: PropertyValues): void {
-    super.willUpdate(changedProperties)
+  protected updated(changedProperties: PropertyValues): void {
+    super.updated(changedProperties)
 
     if (!this.hass || !this.config?.entity) return
 
@@ -56,23 +59,75 @@ export class HypnogramCard extends LitElement {
 
     const entityChanged = this._lastEntityId !== entityId
     const stateChanged = this._lastState !== currentState
+    const needsInitialFetch = this._lastEntityId === undefined
 
-    if (entityChanged || stateChanged) {
+    if (entityChanged || stateChanged || needsInitialFetch) {
       this._lastEntityId = entityId
       this._lastState = currentState
-      this._updateHistory(entityId)
+      void this._updateHistory(entityId)
     }
   }
 
   private async _updateHistory(entityId: string): Promise<void> {
+    const generation = ++this._fetchGeneration
+    const debug = this.config.debug ?? false
     this._loading = true
+
+    const fetchReport = debug
+      ? {
+          startTime: '',
+          hoursAgo: 0,
+          responseKeys: [] as string[],
+          rawCount: 0,
+          uniqueRawStates: [] as string[],
+        }
+      : undefined
+
+    const processReport = debug
+      ? {
+          stateMapping: this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
+          reverseMapping: {},
+          normalizedCount: 0,
+          droppedCount: 0,
+          uniqueStates: [] as string[],
+          sleepWindow: { startIndex: 0, stopIndex: 0 },
+          phasePoints: 0,
+          warnings: [] as string[],
+        }
+      : undefined
+
     try {
-      const historyData = await fetchSleepHistory(this.hass, entityId)
-      this._sleepHistory = processSleepHistory(historyData)
+      const historyData = await fetchSleepHistory(
+        this.hass,
+        entityId,
+        48,
+        fetchReport,
+      )
+      if (generation !== this._fetchGeneration) return
+
+      this._sleepHistory = processSleepHistory(
+        historyData,
+        this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
+        processReport,
+      )
+
+      const segments = buildSleepSegments(this._sleepHistory)
+
+      if (debug && fetchReport && processReport) {
+        logHistoryReport(
+          entityId,
+          this.hass.states[entityId]?.state,
+          segments.length,
+          fetchReport,
+          processReport,
+        )
+      }
     } catch (e) {
       console.error('Error fetching sleep history:', e)
     } finally {
-      this._loading = false
+      if (generation === this._fetchGeneration) {
+        this._loading = false
+      }
     }
   }
 
@@ -123,3 +178,5 @@ export class HypnogramCard extends LitElement {
 
   static styles = cardStyles
 }
+
+logCardBanner(CARD_NAME, CARD_VERSION)

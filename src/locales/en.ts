@@ -11,4 +11,5 @@ export default {
   // Editor
   'editor.title_label': 'Title (Optional)',
   'editor.entity_label': 'Sleep Data Entity (Required)',
+  'editor.debug_label': 'Debug logging (browser console)',
 }

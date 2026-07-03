@@ -3,7 +3,7 @@ import { html, LitElement, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { localize } from '@/localize'
 import { editorStyles } from '@/styles'
-import type { HypnogramCardConfig } from '@/types'
+import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
 
 @customElement('hypnogram-card-editor')
 export class HypnogramCardEditor extends LitElement {
@@ -14,7 +14,7 @@ export class HypnogramCardEditor extends LitElement {
     this._config = config
   }
 
-  private get _schema() {
+  private get _schema(): HaFormSchemaField[] {
     const entities = Object.keys(this.hass.states)
       .filter((eid) => eid.startsWith('sensor.'))
       .sort()
@@ -29,6 +29,10 @@ export class HypnogramCardEditor extends LitElement {
         required: true,
         selector: { entity: { include_entities: entities } },
       },
+      {
+        name: 'debug',
+        selector: { boolean: {} },
+      },
     ]
   }
 
@@ -37,11 +41,13 @@ export class HypnogramCardEditor extends LitElement {
       return html``
     }
 
-    const computeLabel = (schema: any) => {
+    const computeLabel = (schema: HaFormSchemaField) => {
       if (schema.name === 'title')
         return localize('editor.title_label', this.hass)
       if (schema.name === 'entity')
         return localize('editor.entity_label', this.hass)
+      if (schema.name === 'debug')
+        return localize('editor.debug_label', this.hass)
       return schema.name
     }
 

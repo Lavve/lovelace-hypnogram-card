@@ -26,34 +26,36 @@ export class HypnogramChart extends LitElement {
   @property({ attribute: false }) public periodEnd!: Date
 
   protected render(): TemplateResult {
-    if (!this.segments.length) {
-      return html`
-        <div class="empty">${localize('card.no_data', this.hass)}</div>
-      `
-    }
-
     const width = 400
     const dims = getChartDimensions(width, CHART_CONFIG.height)
     const locale = this.hass?.locale?.language
+    const hasData = this.segments.length > 0
 
-    const bars = this.segments.map((segment) => {
-      const rect = getSegmentRect(
-        segment,
-        this.periodStart,
-        this.periodEnd,
-        dims,
-      )
-      return html`
-        <rect
-          x=${rect.x}
-          y=${rect.y}
-          width=${rect.width}
-          height=${rect.height}
-          rx="2"
-          fill=${CHART_BAR_COLOR}
-        />
-      `
-    })
+    const periodStart = hasData
+      ? this.periodStart
+      : new Date(Date.now() - 8 * 60 * 60 * 1000)
+    const periodEnd = hasData ? this.periodEnd : new Date()
+
+    const bars = hasData
+      ? this.segments.map((segment) => {
+          const rect = getSegmentRect(
+            segment,
+            this.periodStart,
+            this.periodEnd,
+            dims,
+          )
+          return html`
+            <rect
+              x=${rect.x}
+              y=${rect.y}
+              width=${rect.width}
+              height=${rect.height}
+              rx="2"
+              fill=${CHART_BAR_COLOR}
+            />
+          `
+        })
+      : []
 
     const phaseLabels = SLEEP_PHASES.map((phase) => {
       const level = PHASE_LEVELS[phase]
@@ -72,9 +74,9 @@ export class HypnogramChart extends LitElement {
       `
     })
 
-    const timeTicks = getTimeTicks(this.periodStart, this.periodEnd)
+    const timeTicks = getTimeTicks(periodStart, periodEnd)
     const timeLabels = timeTicks.map((tick) => {
-      const x = timeToX(tick, this.periodStart, this.periodEnd, dims)
+      const x = timeToX(tick, periodStart, periodEnd, dims)
       return html`
         <text
           x=${x}
@@ -103,16 +105,27 @@ export class HypnogramChart extends LitElement {
     })
 
     return html`
-      <svg
-        viewBox="0 0 ${dims.width} ${dims.height}"
-        preserveAspectRatio="xMidYMid meet"
-        class="chart"
-      >
-        ${gridLines}
-        ${bars}
-        ${phaseLabels}
-        ${timeLabels}
-      </svg>
+      <div class="chart-container">
+        <svg
+          viewBox="0 0 ${dims.width} ${dims.height}"
+          preserveAspectRatio="xMidYMid meet"
+          class="chart"
+        >
+          ${gridLines}
+          ${bars}
+          ${phaseLabels}
+          ${timeLabels}
+        </svg>
+        ${
+          hasData
+            ? ''
+            : html`
+              <div class="empty-overlay">
+                ${localize('card.no_data', this.hass)}
+              </div>
+            `
+        }
+      </div>
     `
   }
 
