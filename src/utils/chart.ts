@@ -23,15 +23,15 @@ export function getChartDimensions(
 }
 
 export function timeToX(
-  time: Date,
-  start: Date,
-  end: Date,
+  timeMs: number,
+  startMs: number,
+  endMs: number,
   dims: ChartDimensions,
 ): number {
-  const duration = end.getTime() - start.getTime()
+  const duration = endMs - startMs
   if (duration <= 0) return dims.padding.left
 
-  const ratio = (time.getTime() - start.getTime()) / duration
+  const ratio = (timeMs - startMs) / duration
   return dims.padding.left + ratio * dims.plotWidth
 }
 
@@ -41,12 +41,12 @@ export function levelToY(level: number, dims: ChartDimensions): number {
 
 export function getSegmentRect(
   segment: SleepSegment,
-  periodStart: Date,
-  periodEnd: Date,
+  periodStartMs: number,
+  periodEndMs: number,
   dims: ChartDimensions,
 ): { x: number; y: number; width: number; height: number } {
-  const x = timeToX(segment.startTime, periodStart, periodEnd, dims)
-  const xEnd = timeToX(segment.endTime, periodStart, periodEnd, dims)
+  const x = timeToX(segment.startMs, periodStartMs, periodEndMs, dims)
+  const xEnd = timeToX(segment.endMs, periodStartMs, periodEndMs, dims)
   const y = levelToY(segment.level, dims)
 
   return {

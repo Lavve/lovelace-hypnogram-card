@@ -1,30 +1,38 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import { html, LitElement, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
-import '@/components/hypnogram-chart'
+import { renderHypnogramChart } from '@/components/hypnogram-chart'
 import { CARD_NAME, CARD_VERSION, DEFAULT_STATE_MAPPING } from '@/const'
 import '@/hypnogram-card-editor'
 import { localize } from '@/localize'
 import { fetchSleepHistory, processSleepHistory } from '@/services/history'
-import { cardStyles } from '@/styles'
-import type { HypnogramCardConfig, ProcessedSleepHistory } from '@/types'
+import { cardStyles, chartStyles } from '@/styles'
+import type { HypnogramCardConfig, SleepSegment } from '@/types'
 import { logCardBanner, logHistoryReport } from '@/utils/debug'
 import { buildSleepSegments } from '@/utils/segments'
 
-const EMPTY_HISTORY: ProcessedSleepHistory = {
-  points: [],
-  periodStart: new Date(),
-  periodEnd: new Date(),
+declare global {
+  interface Window {
+    customCards?: Array<{
+      type: string
+      name: string
+      description?: string
+      preview?: boolean
+    }>
+  }
 }
 
 @customElement('hypnogram-card')
 export class HypnogramCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant
   @state() private config!: HypnogramCardConfig
-  @state() private _sleepHistory: ProcessedSleepHistory = EMPTY_HISTORY
+  @state() private _segments: SleepSegment[] = []
+  @state() private _periodStartMs = 0
+  @state() private _periodEndMs = 0
   @state() private _loading = false
   private _lastEntityId?: string
   private _lastState?: string
+  private _fetchGeneration = 0
 
   public static getConfigElement(): HTMLElement {
     return document.createElement('hypnogram-card-editor')
@@ -36,8 +44,6 @@ export class HypnogramCard extends LitElement {
       entity: '',
     }
   }
-
-  private _fetchGeneration = 0
 
   public setConfig(config: HypnogramCardConfig): void {
     if (!config.entity) {
@@ -105,19 +111,21 @@ export class HypnogramCard extends LitElement {
       )
       if (generation !== this._fetchGeneration) return
 
-      this._sleepHistory = processSleepHistory(
+      const history = processSleepHistory(
         historyData,
         this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
         processReport,
       )
 
-      const segments = buildSleepSegments(this._sleepHistory)
+      this._periodStartMs = history.periodStart.getTime()
+      this._periodEndMs = history.periodEnd.getTime()
+      this._segments = buildSleepSegments(history)
 
       if (debug && fetchReport && processReport) {
         logHistoryReport(
           entityId,
           this.hass.states[entityId]?.state,
-          segments.length,
+          this._segments.length,
           fetchReport,
           processReport,
         )
@@ -146,37 +154,50 @@ export class HypnogramCard extends LitElement {
     if (!stateObj) {
       return html`
         <ha-card class="error">
-          ${localize('card.error_entity_not_found', this.hass)}: ${entityId}
+          <div class="card-content">
+            ${localize('card.error_entity_not_found', this.hass)}: ${entityId}
+          </div>
         </ha-card>
       `
     }
 
-    const segments = buildSleepSegments(this._sleepHistory)
+    const title = this.config.title || localize('card.title', this.hass)
 
     return html`
       <ha-card>
-        <div class="header">
-          ${this.config.title || localize('card.title', this.hass)}
-        </div>
-        <div class="content">
-          ${
-            this._loading
-              ? html`<div class="loading">${localize('card.loading', this.hass)}</div>`
-              : html`
-                <hypnogram-chart
-                  .hass=${this.hass}
-                  .segments=${segments}
-                  .periodStart=${this._sleepHistory.periodStart}
-                  .periodEnd=${this._sleepHistory.periodEnd}
-                ></hypnogram-chart>
-              `
-          }
+        <div class="card-content">
+          <div class="header">${title}</div>
+          <div class="chart-area">
+            ${renderHypnogramChart(
+              this._segments,
+              this._periodStartMs,
+              this._periodEndMs,
+              this.hass,
+            )}
+            ${
+              this._loading
+                ? html`
+                  <div class="loading-overlay">
+                    ${localize('card.loading', this.hass)}
+                  </div>
+                `
+                : ''
+            }
+          </div>
         </div>
       </ha-card>
     `
   }
 
-  static styles = cardStyles
+  static styles = [cardStyles, chartStyles]
 }
 
 logCardBanner(CARD_NAME, CARD_VERSION)
+
+window.customCards = window.customCards ?? []
+window.customCards.push({
+  type: 'hypnogram-card',
+  name: CARD_NAME,
+  description: 'Sleep hypnogram chart for Home Assistant',
+  preview: true,
+})

@@ -1,46 +1,47 @@
 import { css } from 'lit'
 
 export const cardStyles = css`
+  :host {
+    display: block;
+  }
   ha-card {
-    padding: 16px;
     overflow: hidden;
   }
   .header {
-    font-size: 1.2em;
+    font-size: var(--ha-card-header-font-size, 1.2em);
     font-weight: 500;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     color: var(--primary-text-color);
   }
-  .content {
-    color: var(--primary-text-color);
+  .chart-area {
+    position: relative;
+    min-height: 150px;
   }
-  .error {
+  .error .card-content {
     color: var(--error-color);
     background-color: var(--error-warning-background-color, #ffcccc);
-    padding: 16px;
   }
-  .loading {
+  .loading-overlay {
+    position: absolute;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 150px;
+    background: rgba(0, 0, 0, 0.35);
     color: var(--secondary-text-color);
     font-size: 0.9em;
   }
 `
 
 export const chartStyles = css`
-  :host {
-    display: block;
-    width: 100%;
-  }
   .chart-container {
     position: relative;
     width: 100%;
+    min-height: 150px;
   }
   .chart {
     width: 100%;
-    height: auto;
+    height: 150px;
     display: block;
   }
   .empty-overlay {
@@ -54,17 +55,16 @@ export const chartStyles = css`
     pointer-events: none;
   }
   .phase-label {
-    fill: var(--primary-text-color);
+    fill: var(--primary-text-color, #e0e0e0);
     font-size: 11px;
-    opacity: 0.85;
   }
   .time-label {
-    fill: var(--secondary-text-color);
+    fill: var(--secondary-text-color, #9e9e9e);
     font-size: 10px;
   }
   .grid-line {
-    stroke: var(--divider-color, rgba(255, 255, 255, 0.1));
-    stroke-width: 0.5;
+    stroke: var(--divider-color, rgba(255, 255, 255, 0.25));
+    stroke-width: 1;
   }
 `
 

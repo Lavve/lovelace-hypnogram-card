@@ -50,8 +50,8 @@ export interface SleepDataPoint {
 export interface SleepSegment {
   state: string
   level: number
-  startTime: Date
-  endTime: Date
+  startMs: number
+  endMs: number
 }
 
 export interface ProcessedSleepHistory {

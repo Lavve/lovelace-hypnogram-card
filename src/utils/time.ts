@@ -6,16 +6,18 @@ export function formatTime(date: Date, locale?: string): string {
   })
 }
 
-export function getTimeTicks(start: Date, end: Date, count = 4): Date[] {
-  const startMs = start.getTime()
-  const endMs = end.getTime()
+export function getTimeTicks(
+  startMs: number,
+  endMs: number,
+  count = 4,
+): number[] {
   const duration = endMs - startMs
 
-  if (duration <= 0) return [start]
+  if (duration <= 0) return [startMs]
 
-  const ticks: Date[] = []
+  const ticks: number[] = []
   for (let i = 0; i < count; i++) {
-    ticks.push(new Date(startMs + (duration * i) / (count - 1)))
+    ticks.push(startMs + (duration * i) / (count - 1))
   }
   return ticks
 }
