@@ -57,8 +57,8 @@ export const cardStyles = css`
     margin-bottom: 12px;
   }
   .header {
-    font-size: 1.05em;
     font-weight: 600;
+    font-size: var(--ha-font-size-l);
     color: var(--primary-text-color, #f0f0f0);
     white-space: nowrap;
     overflow: hidden;
@@ -67,7 +67,7 @@ export const cardStyles = css`
     min-width: 0;
   }
   .period-range {
-    font-size: 0.8em;
+    font-size: var(--ha-font-size-s);
     font-weight: 400;
     color: var(--secondary-text-color, #9a9a9a);
     white-space: nowrap;
@@ -81,18 +81,38 @@ export const cardStyles = css`
     position: relative;
     min-height: 168px;
   }
+  .chart-container.has-legends {
+    display: flex;
+    align-items: stretch;
+  }
+  .chart-container.legend-left {
+    flex-direction: row;
+  }
+  .chart-container.legend-right {
+    flex-direction: row-reverse;
+  }
   .legends {
-    font-size: 0.8em;
+    flex: 0 0 auto;
+    width: 4.75rem;
+    box-sizing: border-box;
+    font-size: var(--ha-font-size-s);
+    line-height: 1.2;
     color: var(--secondary-text-color, #9e9e9e);
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-    position: absolute;
+    position: relative;
     z-index: 1;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    position: absolute;
+    height: 100%;
+  }
+  .chart-container.legend-left .legends {
+    text-align: left;
+  }
+  .chart-container.legend-right .legends {
+    text-align: right;
   }
   .legend {
     position: absolute;
+    left: 2px;
+    right: 2px;
     white-space: nowrap;
   }
   .legend.awake {
@@ -129,6 +149,16 @@ export const cardStyles = css`
 export const chartStyles = css`
   .chart-container {
     box-sizing: border-box;
+  }
+  .plot {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
+  .chart-container:not(.has-legends) .plot {
+    position: absolute;
+    inset: 0;
   }
   .bar {
     box-sizing: border-box;

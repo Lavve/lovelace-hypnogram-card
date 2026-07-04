@@ -1,5 +1,7 @@
 import type { ActionConfig, LovelaceCardConfig } from 'custom-card-helpers'
 
+export type LegendPosition = 'left' | 'right'
+
 export interface HypnogramCardConfig extends LovelaceCardConfig {
   type: string
   entity: string
@@ -7,6 +9,7 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   show_title?: boolean
   show_period_range?: boolean
   show_labels?: boolean
+  legend_position?: LegendPosition
   primary_color?: string
   bucket_minutes?: number
   tap_action?: ActionConfig
@@ -23,6 +26,7 @@ export interface HaFormSchemaField {
   required?: boolean
   default?: unknown
   flatten?: boolean
+  disabled?: boolean
   selector?: Record<string, unknown>
   schema?: HaFormSchemaField[]
 }

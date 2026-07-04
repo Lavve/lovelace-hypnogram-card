@@ -16,11 +16,15 @@ export default {
   'editor.title_label': 'Titel',
   'editor.show_title_label': 'Visa titel',
   'editor.show_legends_label': 'Visa legender',
+  'editor.legend_position_label': 'Legendposition',
+  'editor.legend_position.left': 'Vänster',
+  'editor.legend_position.right': 'Höger',
   'editor.display_options_label': 'Visningsalternativ',
   'editor.show_period_range_label': 'Visa tidsintervall',
   'editor.entity_label': 'Sömndata Entitet (Krav)',
   'editor.primary_color_label': 'Diagramfärg',
-  'editor.primary_color_helper': 'hex, rgb eller CSS-variabler',
+  'editor.primary_color_helper':
+    'Hex, RGB eller CSS-variabler. Färgerna på staplarna baseras på denna färg.',
   'editor.chart_configuration_label': 'Diagramkonfiguration',
   'editor.bucket_minutes_label': 'Bucket-storlek (minuter)',
   'editor.bucket_minutes_helper':

@@ -16,11 +16,15 @@ export default {
   'editor.title_label': 'Title',
   'editor.show_title_label': 'Show title',
   'editor.show_legends_label': 'Show legends',
+  'editor.legend_position_label': 'Legend position',
+  'editor.legend_position.left': 'Left',
+  'editor.legend_position.right': 'Right',
   'editor.display_options_label': 'Display options',
   'editor.show_period_range_label': 'Show time range',
   'editor.entity_label': 'Sleep Data Entity (Required)',
   'editor.primary_color_label': 'Chart color',
-  'editor.primary_color_helper': 'hex, rgb or CSS variables',
+  'editor.primary_color_helper':
+    'Hex, RGB or CSS variables. Bars will be based on this color.',
   'editor.chart_configuration_label': 'Chart configuration',
   'editor.bucket_minutes_label': 'Bucket size (minutes)',
   'editor.bucket_minutes_helper':

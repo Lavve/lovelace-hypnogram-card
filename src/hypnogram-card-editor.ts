@@ -25,6 +25,7 @@ export class HypnogramCardEditor extends LitElement {
       show_title: config.show_title ?? true,
       show_period_range: config.show_period_range ?? true,
       show_labels: config.show_labels ?? false,
+      legend_position: config.legend_position ?? 'left',
       primary_color: config.primary_color ?? DEFAULT_PRIMARY_COLOR,
       bucket_minutes: config.bucket_minutes ?? CHART_CONFIG.bucketMinutes,
       tap_action: config.tap_action ?? { action: 'more-info' },
@@ -72,6 +73,26 @@ export class HypnogramCardEditor extends LitElement {
             name: 'show_labels',
             default: false,
             selector: { boolean: {} },
+          },
+          {
+            name: 'legend_position',
+            default: 'left',
+            disabled: !this._config.show_labels,
+            selector: {
+              select: {
+                mode: 'dropdown',
+                options: [
+                  {
+                    value: 'left',
+                    label: localize('editor.legend_position.left', this.hass),
+                  },
+                  {
+                    value: 'right',
+                    label: localize('editor.legend_position.right', this.hass),
+                  },
+                ],
+              },
+            },
           },
         ],
       },
@@ -144,6 +165,8 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.show_period_range_label', this.hass)
       if (schema.name === 'show_labels')
         return localize('editor.show_legends_label', this.hass)
+      if (schema.name === 'legend_position')
+        return localize('editor.legend_position_label', this.hass)
       if (schema.name === 'display_options')
         return localize('editor.display_options_label', this.hass)
       if (schema.name === 'entity')
@@ -198,7 +221,8 @@ export class HypnogramCardEditor extends LitElement {
   }
 
   private _valueChanged(ev: CustomEvent): void {
-    const config = ev.detail.value
+    const config = ev.detail.value as HypnogramCardConfig
+    this._config = config
 
     const event = new CustomEvent('config-changed', {
       detail: { config },

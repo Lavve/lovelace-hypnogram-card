@@ -4,7 +4,7 @@ import { styleMap } from 'lit/directives/style-map.js'
 import { CHART_CONFIG } from '@/const'
 import { localize } from '@/localize'
 import { buildChartPalette } from '@/styles'
-import type { ChartPalette, SleepSegment } from '@/types'
+import type { ChartPalette, LegendPosition, SleepSegment } from '@/types'
 import {
   buildCompressedLayout,
   getAdjacentBarSegments,
@@ -28,6 +28,7 @@ export function renderHypnogramChart(
   hass?: HomeAssistant,
   primaryColor?: string,
   showLegends?: boolean,
+  legendPosition: LegendPosition = 'left',
   context?: HTMLElement,
 ): TemplateResult {
   const palette = buildChartPalette(primaryColor, context)
@@ -87,7 +88,7 @@ export function renderHypnogramChart(
 
   return html`
     <div
-      class="chart-container"
+      class="chart-container${showLegends ? ` has-legends legend-${legendPosition}` : ''}"
       style=${styleMap({
         position: 'relative',
         width: '100%',
@@ -109,13 +110,7 @@ export function renderHypnogramChart(
           : ''
       }
 
-      <div
-        class="plot"
-        style=${styleMap({
-          position: 'absolute',
-          inset: '0',
-        })}
-      >
+      <div class="plot">
         ${sleepBars}
         ${awakeLines}
       </div>

@@ -42,6 +42,46 @@ declare global {
   }
 }
 
+const DOCUMENT_CANCEL_EVENTS = [
+  'touchcancel',
+  'mouseout',
+  'mouseup',
+  'touchmove',
+  'mousewheel',
+  'wheel',
+  'scroll',
+] as const
+
+let documentListenersAttached = false
+let activeActionHandler: ActionHandler | null = null
+
+function attachDocumentListeners(): void {
+  if (documentListenersAttached) return
+  documentListenersAttached = true
+
+  const handleDocumentEvent = (): void => {
+    const actionHandler = activeActionHandler
+    if (!actionHandler) return
+
+    actionHandler.cancelled = true
+    if (actionHandler.timer) {
+      actionHandler.stopAnimation()
+      clearTimeout(actionHandler.timer)
+      actionHandler.timer = undefined
+      if (actionHandler.isRepeating && actionHandler.repeatTimeout) {
+        window.clearInterval(actionHandler.repeatTimeout)
+        actionHandler.isRepeating = false
+      }
+    }
+  }
+
+  for (const eventName of DOCUMENT_CANCEL_EVENTS) {
+    document.addEventListener(eventName, handleDocumentEvent, {
+      passive: true,
+    })
+  }
+}
+
 function setupActionHandlerMethods(element: HTMLElement): ActionHandler {
   const actionHandler = element as ActionHandler
 
@@ -233,39 +273,17 @@ function setupActionHandlerMethods(element: HTMLElement): ActionHandler {
     }
   }
 
-  ;[
-    'touchcancel',
-    'mouseout',
-    'mouseup',
-    'touchmove',
-    'mousewheel',
-    'wheel',
-    'scroll',
-  ].forEach((ev) => {
-    document.addEventListener(
-      ev,
-      () => {
-        actionHandler.cancelled = true
-        if (actionHandler.timer) {
-          actionHandler.stopAnimation()
-          clearTimeout(actionHandler.timer)
-          actionHandler.timer = undefined
-          if (actionHandler.isRepeating && actionHandler.repeatTimeout) {
-            window.clearInterval(actionHandler.repeatTimeout)
-            actionHandler.isRepeating = false
-          }
-        }
-      },
-      { passive: true },
-    )
-  })
+  attachDocumentListeners()
 
   return actionHandler
 }
 
 function getActionHandler(): ActionHandler {
   const existing = document.body.querySelector('.action-handler-hypnogram-card')
-  if (existing) return existing as ActionHandler
+  if (existing) {
+    activeActionHandler = existing as ActionHandler
+    return activeActionHandler
+  }
 
   const div = document.createElement('div')
   div.className = 'action-handler-hypnogram-card'
@@ -285,9 +303,11 @@ function getActionHandler(): ActionHandler {
   actionHandler.holdTime = 500
   actionHandler.cancelled = false
   actionHandler.held = false
+  actionHandler.isRepeating = false
 
   document.body.appendChild(div)
-  return setupActionHandlerMethods(div)
+  activeActionHandler = setupActionHandlerMethods(div)
+  return activeActionHandler
 }
 
 function actionHandlerBind(

@@ -218,6 +218,7 @@ export class HypnogramCard extends LitElement {
             this.hass,
             this.config.primary_color ?? DEFAULT_PRIMARY_COLOR,
             this.config.show_labels ?? false,
+            this.config.legend_position ?? 'left',
             this,
           )}
           ${
