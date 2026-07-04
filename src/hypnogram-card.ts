@@ -1,9 +1,9 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import {
+  type ActionHandlerEvent,
   handleAction,
   hasAction,
   hasDoubleClick,
-  type ActionHandlerEvent,
 } from 'custom-card-helpers'
 import { html, LitElement, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
@@ -174,12 +174,13 @@ export class HypnogramCard extends LitElement {
       `
     }
 
+    const showTitle = this.config.show_title !== false
+    const showPeriod = this.config.show_period_range !== false
     const title = this.config.title || localize('card.title', this.hass)
-    const locale = this.hass.locale?.language
     const periodRange = formatPeriodRange(
       this._periodStartMs,
       this._periodEndMs,
-      locale,
+      this.hass.locale,
     )
 
     const interactive =
@@ -197,10 +198,18 @@ export class HypnogramCard extends LitElement {
         })}
         tabindex=${interactive ? '0' : '-1'}
       >
-        <div class="header-row">
-          <div class="header">${title}</div>
-          ${periodRange ? html`<div class="period-range">${periodRange}</div>` : ''}
-        </div>
+        ${
+          showTitle || showPeriod
+            ? html`
+              <div class="header-row">
+                <div class="header${showTitle ? '' : ' is-hidden'}">${title}</div>
+                <div class="period-range${showPeriod ? '' : ' is-hidden'}">
+                  ${periodRange}
+                </div>
+              </div>
+            `
+            : ''
+        }
         <div class="chart-area">
           ${renderHypnogramChart(
             this._segments,
@@ -208,6 +217,7 @@ export class HypnogramCard extends LitElement {
             this._periodEndMs,
             this.hass,
             this.config.primary_color ?? DEFAULT_PRIMARY_COLOR,
+            this.config.show_labels ?? false,
             this,
           )}
           ${

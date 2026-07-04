@@ -63,6 +63,8 @@ export const cardStyles = css`
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
   }
   .period-range {
     font-size: 0.8em;
@@ -71,9 +73,39 @@ export const cardStyles = css`
     white-space: nowrap;
     flex-shrink: 0;
   }
+  .header.is-hidden,
+  .period-range.is-hidden {
+    visibility: hidden;
+  }
   .chart-area {
     position: relative;
     min-height: 168px;
+  }
+  .legends {
+    font-size: 0.8em;
+    color: var(--secondary-text-color, #9e9e9e);
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+  }
+  .legend {
+    position: absolute;
+    white-space: nowrap;
+  }
+  .legend.awake {
+    top: 0;
+  }
+  .legend.rem {
+    top: 25%;
+  }
+  .legend.light_sleep {
+    top: 50%;
+  }
+  .legend.deep_sleep {
+    top: 75%;
   }
   .error {
     color: var(--error-color);

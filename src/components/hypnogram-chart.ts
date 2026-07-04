@@ -27,6 +27,7 @@ export function renderHypnogramChart(
   _periodEndMs: number,
   hass?: HomeAssistant,
   primaryColor?: string,
+  showLegends?: boolean,
   context?: HTMLElement,
 ): TemplateResult {
   const palette = buildChartPalette(primaryColor, context)
@@ -77,6 +78,13 @@ export function renderHypnogramChart(
     return html`<div class="awake-line" style=${styleMap(lineStyle)}></div>`
   })
 
+  const labels = [
+    { key: 'deep_sleep', label: localize('card.label.deep_sleep', hass) },
+    { key: 'rem', label: localize('card.label.rem', hass) },
+    { key: 'awake', label: localize('card.label.awake', hass) },
+    { key: 'light_sleep', label: localize('card.label.light_sleep', hass) },
+  ]
+
   return html`
     <div
       class="chart-container"
@@ -89,6 +97,18 @@ export function renderHypnogramChart(
         overflow: 'hidden',
       })}
     >
+      ${
+        showLegends
+          ? html`
+          <div class="legends">
+            ${labels.map(
+              (label) => html`
+            <div class="legend ${label.key}">${label.label}</div>`,
+            )}
+          </div>`
+          : ''
+      }
+
       <div
         class="plot"
         style=${styleMap({

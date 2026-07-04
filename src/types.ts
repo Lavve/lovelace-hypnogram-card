@@ -4,6 +4,9 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   type: string
   entity: string
   title?: string
+  show_title?: boolean
+  show_period_range?: boolean
+  show_labels?: boolean
   primary_color?: string
   bucket_minutes?: number
   tap_action?: ActionConfig

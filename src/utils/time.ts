@@ -1,19 +1,16 @@
-export function formatTime(date: Date, locale?: string): string {
-  return date.toLocaleTimeString(locale || undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-}
+import {
+  type FrontendLocaleData,
+  formatTime as formatHaTime,
+} from 'custom-card-helpers'
 
 export function formatPeriodRange(
   startMs: number,
   endMs: number,
-  locale?: string,
+  locale?: FrontendLocaleData,
 ): string {
-  if (!startMs || !endMs || endMs <= startMs) return ''
+  if (!startMs || !endMs || endMs <= startMs || !locale) return ''
 
-  return `${formatTime(new Date(startMs), locale)} — ${formatTime(new Date(endMs), locale)}`
+  return `${formatHaTime(new Date(startMs), locale)} — ${formatHaTime(new Date(endMs), locale)}`
 }
 
 export function getTimeTicks(

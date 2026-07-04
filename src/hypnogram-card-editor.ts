@@ -22,6 +22,9 @@ export class HypnogramCardEditor extends LitElement {
   public setConfig(config: HypnogramCardConfig): void {
     this._config = {
       ...config,
+      show_title: config.show_title ?? true,
+      show_period_range: config.show_period_range ?? true,
+      show_labels: config.show_labels ?? false,
       primary_color: config.primary_color ?? DEFAULT_PRIMARY_COLOR,
       bucket_minutes: config.bucket_minutes ?? CHART_CONFIG.bucketMinutes,
       tap_action: config.tap_action ?? { action: 'more-info' },
@@ -41,13 +44,36 @@ export class HypnogramCardEditor extends LitElement {
 
     return [
       {
-        name: 'title',
-        selector: { text: {} },
-      },
-      {
         name: 'entity',
         required: true,
         selector: { entity: { include_entities: entities } },
+      },
+      {
+        type: 'expandable',
+        name: 'display_options',
+        icon: 'mdi:eye-outline',
+        flatten: true,
+        schema: [
+          {
+            name: 'title',
+            selector: { text: {} },
+          },
+          {
+            name: 'show_title',
+            default: true,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_period_range',
+            default: true,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_labels',
+            default: false,
+            selector: { boolean: {} },
+          },
+        ],
       },
       {
         type: 'expandable',
@@ -61,29 +87,45 @@ export class HypnogramCardEditor extends LitElement {
         })),
       },
       {
-        name: 'primary_color',
-        default: DEFAULT_PRIMARY_COLOR,
-        selector: { text: {} },
+        type: 'expandable',
+        name: 'chart_configuration',
+        icon: 'mdi:chart-line',
+        flatten: true,
+        schema: [
+          {
+            name: 'primary_color',
+            default: DEFAULT_PRIMARY_COLOR,
+            selector: { text: {} },
+          },
+          {
+            name: 'bucket_minutes',
+            default: CHART_CONFIG.bucketMinutes,
+            selector: { number: { min: 1, max: 60, step: 1, mode: 'box' } },
+          },
+        ],
       },
       {
-        name: 'bucket_minutes',
-        default: CHART_CONFIG.bucketMinutes,
-        selector: { number: { min: 1, max: 60, step: 1, mode: 'box' } },
-      },
-      {
-        name: 'tap_action',
-        default: { action: 'more-info' },
-        selector: { ui_action: { default_action: 'more-info' } },
-      },
-      {
-        name: 'hold_action',
-        default: { action: 'none' },
-        selector: { ui_action: {} },
-      },
-      {
-        name: 'double_tap_action',
-        default: { action: 'none' },
-        selector: { ui_action: {} },
+        type: 'expandable',
+        name: 'interaction',
+        icon: 'mdi:gesture-tap',
+        flatten: true,
+        schema: [
+          {
+            name: 'tap_action',
+            default: { action: 'more-info' },
+            selector: { ui_action: { default_action: 'more-info' } },
+          },
+          {
+            name: 'hold_action',
+            default: { action: 'none' },
+            selector: { ui_action: {} },
+          },
+          {
+            name: 'double_tap_action',
+            default: { action: 'none' },
+            selector: { ui_action: {} },
+          },
+        ],
       },
     ]
   }
@@ -96,18 +138,30 @@ export class HypnogramCardEditor extends LitElement {
     const computeLabel = (schema: HaFormSchemaField) => {
       if (schema.name === 'title')
         return localize('editor.title_label', this.hass)
+      if (schema.name === 'show_title')
+        return localize('editor.show_title_label', this.hass)
+      if (schema.name === 'show_period_range')
+        return localize('editor.show_period_range_label', this.hass)
+      if (schema.name === 'show_labels')
+        return localize('editor.show_legends_label', this.hass)
+      if (schema.name === 'display_options')
+        return localize('editor.display_options_label', this.hass)
       if (schema.name === 'entity')
         return localize('editor.entity_label', this.hass)
       if (schema.name === 'primary_color')
         return localize('editor.primary_color_label', this.hass)
       if (schema.name === 'bucket_minutes')
         return localize('editor.bucket_minutes_label', this.hass)
+      if (schema.name === 'chart_configuration')
+        return localize('editor.chart_configuration_label', this.hass)
       if (schema.name === 'tap_action')
         return localize('editor.tap_action_label', this.hass)
       if (schema.name === 'hold_action')
         return localize('editor.hold_action_label', this.hass)
       if (schema.name === 'double_tap_action')
         return localize('editor.double_tap_action_label', this.hass)
+      if (schema.name === 'interaction')
+        return localize('editor.interaction_label', this.hass)
       if (schema.name === 'state_mapping')
         return localize('editor.state_mapping_label', this.hass)
       if (
