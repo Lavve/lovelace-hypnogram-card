@@ -78,31 +78,24 @@ export const cardStyles = css`
     position: relative;
     min-height: 168px;
   }
-  .chart-container.has-legends {
-    display: flex;
-    align-items: stretch;
-  }
-  .chart-container.legend-left {
-    flex-direction: row;
-  }
-  .chart-container.legend-right {
-    flex-direction: row-reverse;
-  }
   .legends {
-    flex: 0 0 auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
     width: 4.75rem;
     box-sizing: border-box;
     font-size: var(--ha-font-size-s);
     line-height: 1.2;
     color: var(--secondary-text-color, #9e9e9e);
-    position: absolute;
-    height: 100%;
     z-index: 1;
+    pointer-events: none;
   }
   .chart-container.legend-left .legends {
+    left: 0;
     text-align: left;
   }
   .chart-container.legend-right .legends {
+    right: 0;
     text-align: right;
   }
   .legend {
@@ -147,12 +140,6 @@ export const chartStyles = css`
     box-sizing: border-box;
   }
   .plot {
-    position: relative;
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
-  }
-  .chart-container:not(.has-legends) .plot {
     position: absolute;
     inset: 0;
   }

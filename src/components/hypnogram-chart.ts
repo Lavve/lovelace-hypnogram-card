@@ -86,7 +86,7 @@ export function renderHypnogramChart(
 
   return html`
     <div
-      class="chart-container${showLegends ? ` has-legends legend-${legendPosition}` : ''}"
+      class="chart-container${showLegends ? ` legend-${legendPosition}` : ''}"
       style=${styleMap({
         position: 'relative',
         width: '100%',

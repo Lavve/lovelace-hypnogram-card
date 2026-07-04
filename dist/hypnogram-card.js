@@ -1101,31 +1101,24 @@ const cardStyles = i$5 `
     position: relative;
     min-height: 168px;
   }
-  .chart-container.has-legends {
-    display: flex;
-    align-items: stretch;
-  }
-  .chart-container.legend-left {
-    flex-direction: row;
-  }
-  .chart-container.legend-right {
-    flex-direction: row-reverse;
-  }
   .legends {
-    flex: 0 0 auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
     width: 4.75rem;
     box-sizing: border-box;
     font-size: var(--ha-font-size-s);
     line-height: 1.2;
     color: var(--secondary-text-color, #9e9e9e);
-    position: absolute;
-    height: 100%;
     z-index: 1;
+    pointer-events: none;
   }
   .chart-container.legend-left .legends {
+    left: 0;
     text-align: left;
   }
   .chart-container.legend-right .legends {
+    right: 0;
     text-align: right;
   }
   .legend {
@@ -1169,12 +1162,6 @@ const chartStyles = i$5 `
     box-sizing: border-box;
   }
   .plot {
-    position: relative;
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
-  }
-  .chart-container:not(.has-legends) .plot {
     position: absolute;
     inset: 0;
   }
@@ -1343,7 +1330,7 @@ function renderHypnogramChart(segments, hass, primaryColor, showLegends, legendP
     ];
     return b `
     <div
-      class="chart-container${showLegends ? ` has-legends legend-${legendPosition}` : ''}"
+      class="chart-container${showLegends ? ` legend-${legendPosition}` : ''}"
       style=${o({
         position: 'relative',
         width: '100%',
