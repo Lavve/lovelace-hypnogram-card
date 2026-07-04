@@ -1,0 +1,49 @@
+name: 🛡️ Verify Code and HACS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate-code:
+    name: 🧪 Lint & Build Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: 📥 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧼 Run Biome Lint
+        run: pnpm lint
+
+      - name: 🏗️ Test Production Build
+        run: pnpm build
+
+  validate-hacs:
+    name: 🏪 HACS Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🤖 HACS Action
+        uses: hacs/action@main
+        with:
+          category: plugin
