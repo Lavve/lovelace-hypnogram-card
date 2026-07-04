@@ -23,8 +23,6 @@ function getPhaseColor(palette: ChartPalette, state: string): string {
 
 export function renderHypnogramChart(
   segments: SleepSegment[],
-  _periodStartMs: number | undefined,
-  _periodEndMs: number | undefined,
   hass?: HomeAssistant,
   primaryColor?: string,
   showLegends?: boolean,

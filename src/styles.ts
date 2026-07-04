@@ -12,11 +12,8 @@ export function buildChartPalette(
   primaryColor: PrimaryColorInput = DEFAULT_PRIMARY_COLOR,
   context?: HTMLElement,
 ): ChartPalette {
-  const resolved = resolvePrimaryColor(primaryColor, context)
-  const phaseColors = derivePhaseColors(
-    resolved.source || DEFAULT_PRIMARY_COLOR,
-    resolved.rgb,
-  )
+  const { rgb } = resolvePrimaryColor(primaryColor, context)
+  const phaseColors = derivePhaseColors(rgb)
 
   return { phaseColors }
 }
@@ -179,16 +176,5 @@ export const chartStyles = css`
     font-size: 0.9em;
     pointer-events: none;
     z-index: 3;
-  }
-`
-
-export const editorStyles = css`
-  .card-config {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  ha-textfield, ha-combo-box {
-    width: 100%;
   }
 `

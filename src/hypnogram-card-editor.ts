@@ -7,7 +7,6 @@ import {
   DEFAULT_STATE_MAPPING,
 } from '@/const'
 import { localize } from '@/locales/localize'
-import { editorStyles } from '@/styles'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
 
@@ -62,6 +61,7 @@ export class HypnogramCardEditor extends LitElement {
           {
             name: 'title',
             selector: { text: {} },
+            disabled: !this._config.show_title,
           },
           {
             name: 'show_title',
@@ -242,6 +242,4 @@ export class HypnogramCardEditor extends LitElement {
     })
     this.dispatchEvent(event)
   }
-
-  static styles = editorStyles
 }

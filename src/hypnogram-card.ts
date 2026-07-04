@@ -218,8 +218,6 @@ export class HypnogramCard extends LitElement {
         <div class="chart-area">
           ${renderHypnogramChart(
             this._segments,
-            this._periodStartMs,
-            this._periodEndMs,
             this.hass,
             this.config.primary_color ?? DEFAULT_PRIMARY_COLOR,
             this.config.show_labels ?? false,

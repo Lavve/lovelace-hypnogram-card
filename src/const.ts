@@ -1,14 +1,9 @@
-import type {
-  HypnogramCardStateMapping,
-  SleepIntegrationPreset,
-  SleepPhase,
-} from '@/types'
+import type { HypnogramCardStateMapping, SleepIntegrationPreset } from '@/types'
 
 export const CARD_NAME = 'HYPNOGRAM-CARD'
 export const CARD_VERSION = '0.0.1'
 
 export const SLEEP_AS_ANDROID = {
-  phases: ['awake', 'rem', 'light_sleep', 'deep_sleep'],
   phaseLevels: {
     awake: 4,
     rem: 3,
@@ -26,8 +21,6 @@ export const SLEEP_AS_ANDROID = {
     stopped: 'sleep_tracking_stopped',
   },
 } as const satisfies SleepIntegrationPreset
-
-export const SLEEP_PHASES: SleepPhase[] = [...SLEEP_AS_ANDROID.phases]
 
 export const PHASE_LEVELS: Record<string, number> = {
   ...SLEEP_AS_ANDROID.phaseLevels,

@@ -41,7 +41,6 @@ export interface HypnogramCardStateMapping {
 }
 
 export interface SleepIntegrationPreset {
-  phases: readonly SleepPhase[]
   phaseLevels: Record<SleepPhase, number>
   stateMapping: HypnogramCardStateMapping
   tracking: {

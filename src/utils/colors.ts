@@ -1,12 +1,12 @@
 import type { SleepPhase } from '@/types'
 
-export interface Rgb {
+interface Rgb {
   r: number
   g: number
   b: number
 }
 
-export interface Hsl {
+interface Hsl {
   h: number
   s: number
   l: number
@@ -65,7 +65,7 @@ const DARK_MODE_LIGHTEN: Record<SleepPhase, number> = {
 
 export type PrimaryColorInput = string | number[] | undefined
 
-export function parseHexColor(input: string): Rgb | null {
+function parseHexColor(input: string): Rgb | null {
   const normalized = input.trim().toLowerCase()
   const match = normalized.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/)
   if (!match) return null
@@ -88,7 +88,7 @@ function channelToByte(value: string, isPercent: boolean): number {
   return Math.min(255, Math.max(0, Math.round(scaled)))
 }
 
-export function parseRgbColor(input: string): Rgb | null {
+function parseRgbColor(input: string): Rgb | null {
   const trimmed = input.trim()
   const hex = parseHexColor(trimmed)
   if (hex) return hex
@@ -108,13 +108,13 @@ export function parseRgbColor(input: string): Rgb | null {
   }
 }
 
-export function rgbToHex({ r, g, b }: Rgb): string {
+function rgbToHex({ r, g, b }: Rgb): string {
   return `#${[r, g, b]
     .map((channel) => channel.toString(16).padStart(2, '0'))
     .join('')}`
 }
 
-export function rgbToHsl({ r, g, b }: Rgb): Hsl {
+function rgbToHsl({ r, g, b }: Rgb): Hsl {
   const rn = r / 255
   const gn = g / 255
   const bn = b / 255
@@ -146,7 +146,7 @@ export function rgbToHsl({ r, g, b }: Rgb): Hsl {
   return { h: hue, s: saturation, l: lightness }
 }
 
-export function hslToHex({ h, s, l }: Hsl): string {
+function hslToHex({ h, s, l }: Hsl): string {
   const hue = ((h % 1) + 1) % 1
   const saturation = Math.min(1, Math.max(0, s))
   const lightness = Math.min(1, Math.max(0, l))
@@ -177,9 +177,7 @@ export function hslToHex({ h, s, l }: Hsl): string {
   return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`
 }
 
-export function normalizePrimaryColor(
-  color: PrimaryColorInput,
-): string | undefined {
+function normalizePrimaryColor(color: PrimaryColorInput): string | undefined {
   if (!color) return undefined
   if (typeof color === 'string') {
     const trimmed = color.trim()
@@ -196,10 +194,7 @@ export function normalizePrimaryColor(
   return undefined
 }
 
-export function resolveCssColor(
-  color: string,
-  context?: HTMLElement,
-): string | null {
+function resolveCssColor(color: string, context?: HTMLElement): string | null {
   if (typeof window === 'undefined') return null
 
   const probe = document.createElement('span')
@@ -333,10 +328,7 @@ function deriveDarkPalette(
   return colors
 }
 
-export function derivePhaseColors(
-  _source: string,
-  rgb: Rgb | null,
-): Record<SleepPhase, string> {
+export function derivePhaseColors(rgb: Rgb | null): Record<SleepPhase, string> {
   const derivationRgb = rgb ?? defaultDerivationRgb()
   const hsl = rgbToHsl(derivationRgb)
   const { h, s } = resolveHueAndSaturation(hsl)

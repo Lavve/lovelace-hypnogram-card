@@ -1,9 +1,6 @@
 # Dependencies (fetched via pnpm install)
 node_modules/
 
-# Compiled code (generated via pnpm build)
-dist/
-
 # Local environment variables and secrets
 .env
 .env.*
@@ -19,5 +16,4 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Other
-AGENT.md
 TODO.md

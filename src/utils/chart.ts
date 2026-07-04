@@ -1,12 +1,12 @@
 import { CHART_CONFIG } from '@/const'
 import type { ChartDimensions, SleepSegment } from '@/types'
 
-export interface LayoutSegment extends SleepSegment {
+interface LayoutSegment extends SleepSegment {
   layoutStartMs: number
   layoutEndMs: number
 }
 
-export interface CompressedChartLayout {
+interface CompressedChartLayout {
   bars: LayoutSegment[]
   awakeLineMs: number[]
   layoutStartMs: number
@@ -34,7 +34,7 @@ export function getChartDimensions(
   }
 }
 
-export function timeToX(
+function timeToX(
   timeMs: number,
   startMs: number,
   endMs: number,
@@ -47,7 +47,7 @@ export function timeToX(
   return dims.padding.left + ratio * dims.plotWidth
 }
 
-export function levelToY(level: number, dims: ChartDimensions): number {
+function levelToY(level: number, dims: ChartDimensions): number {
   return dims.padding.top + (4 - level) * dims.levelHeight
 }
 

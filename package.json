@@ -1,8 +1,9 @@
 {
-  "name": "hypnogram-card",
+  "name": "lovelace-hypnogram-card",
   "type": "module",
   "version": "0.0.1",
   "description": "A custom Home Assistant card to display a sleep hypnogram.",
+  "repository": "github:Lavve/lovelace-hypnogram-card",
   "keywords": [
     "home-assistant",
     "homeassistant",

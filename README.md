@@ -2,7 +2,7 @@
 
 A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that visualizes your latest sleep session as a hypnogram — a stacked chart of sleep phases over time.
 
-![Hypnogram card on a dashboard](.\images\screenshot-dashboard.png)
+![Hypnogram card on a dashboard](./images/screenshot-dashboard.png)
 
 ## What is it for?
 
@@ -10,9 +10,9 @@ The card reads history from a sleep-related sensor entity and turns phase change
 
 ## Who is it for?
 
-This card is aimed at Home Assistant users who track sleep and want a visual summary on their dashboard — not just a text state or numeric score.
+This card is aimed at Home Assistant users who track sleep and want a visual summary on their dashboard, not just a text state or numeric score.
 
-**Works out of the box with [Sleep as Android](https://sleep.urbandroid.org/)** via its Home Assistant integration. The default state mapping matches Sleep as Android entity states (`deep_sleep`, `light_sleep`, `rem`, `awake`).
+**Works out of the box** with [Sleep as Android](https://sleep.urbandroid.org/) via its Home Assistant integration. The default state mapping matches Sleep as Android entity states (`deep_sleep`, `light_sleep`, `rem`, `awake`).
 
 If you use another integration that reports sleep phases differently, you can remap entity states in the card editor under **State mapping**.
 
@@ -29,12 +29,29 @@ If you use another integration that reports sleep phases differently, you can re
 
 ## Screenshots
 
-| Dashboard                                                             | Card editor                                                                |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![Hypnogram card on a dashboard](.\images\screenshot-dashboard.png)   |                                                                            |
-| ![Hypnogram card on a dashboard](.\images\screenshot-dashboard-4.png) |                                                                            |
-| ![Hypnogram card on a dashboard](.\images\screenshot-dashboard-3.png) |                                                                            |
-| ![Hypnogram card on a dashboard](.\images\screenshot-dashboard-2.png) | ![Card configuration in the visual editor](./images/screenshot-editor.png) |
+<table>
+  <thead>
+    <tr>
+      <th>Dashboard</th>
+      <th>Card editor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><img src="./images/screenshot-dashboard.png" alt="Hypnogram card on a dashboard"></td>
+      <td rowspan="4" style="vertical-align: top;"><img src="./images/screenshot-editor.png" alt="Card configuration in the visual editor"></td>
+    </tr>
+    <tr>
+      <td><img src="./images/screenshot-dashboard-4.png" alt="Hypnogram card on a dashboard"></td>
+    </tr>
+    <tr>
+      <td><img src="./images/screenshot-dashboard-3.png" alt="Hypnogram card on a dashboard"></td>
+    </tr>
+    <tr>
+      <td><img src="./images/screenshot-dashboard-2.png" alt="Hypnogram card on a dashboard"></td>
+    </tr>
+  </tbody>
+</table>
 
 ## Requirements
 
@@ -45,18 +62,18 @@ If you use another integration that reports sleep phases differently, you can re
 
 ### HACS (recommended)
 
-1. Add this repository as a [custom repository](https://hacs.xyz/docs/faq/custom_repositories/) in HACS (**Frontend** category).
+1. Add this repository as a [custom repository](https://hacs.xyz/docs/faq/custom_repositories/) in HACS (**Frontend** category): `https://github.com/Lavve/lovelace-hypnogram-card`
 2. Search for **Hypnogram Card** and install it.
 3. Add the card resource if prompted, or reload your dashboard.
 
 ### Manual
 
-1. Download `hypnogram-card.js` from the [latest release](https://github.com/Lavve/ha_hypnogram-card/releases) (or build it locally — see [Development](#development)).
+1. Download `hypnogram-card.js` from the [latest release](https://github.com/Lavve/lovelace-hypnogram-card/releases) (or build it locally — see [Development](#development)).
 
 2. Copy the file to your Home Assistant `config/www/` folder.
 
 3. Add a Lovelace resource:
-   
+
    ```yaml
    url: /local/hypnogram-card.js
    type: module
@@ -136,7 +153,7 @@ Time formatting (12h/24h) uses Home Assistant's locale settings automatically.
 
 ### Adding a new language
 
-Contributions are welcome. To add a language, open a pull request on [GitHub](https://github.com/Lavve/ha_hypnogram-card):
+Contributions are welcome. To add a language, open a pull request on [GitHub](https://github.com/Lavve/lovelace-hypnogram-card):
 
 1. Copy `src/locales/en.ts` to `src/locales/<code>.ts` using the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (e.g. `de.ts` for German).
 2. Translate every string value. Keep the keys unchanged.
