@@ -6,7 +6,7 @@ import {
   clampBucketMinutes,
   DEFAULT_STATE_MAPPING,
 } from '@/const'
-import { localize } from '@/localize'
+import { localize } from '@/locales/localize'
 import { editorStyles } from '@/styles'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'

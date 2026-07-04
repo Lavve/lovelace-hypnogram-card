@@ -16,7 +16,7 @@ import {
   DEFAULT_STATE_MAPPING,
 } from '@/const'
 import '@/hypnogram-card-editor'
-import { localize } from '@/localize'
+import { localize } from '@/locales/localize'
 import { fetchSleepHistory, processSleepHistory } from '@/services/history'
 import { cardStyles, chartStyles } from '@/styles'
 import type { HypnogramCardConfig, SleepSegment } from '@/types'

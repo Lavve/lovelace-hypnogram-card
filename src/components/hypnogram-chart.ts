@@ -2,7 +2,7 @@ import type { HomeAssistant } from 'custom-card-helpers'
 import { html, type TemplateResult } from 'lit'
 import { styleMap } from 'lit/directives/style-map.js'
 import { CHART_CONFIG } from '@/const'
-import { localize } from '@/localize'
+import { localize } from '@/locales/localize'
 import { buildChartPalette } from '@/styles'
 import type { ChartPalette, LegendPosition, SleepSegment } from '@/types'
 import {
