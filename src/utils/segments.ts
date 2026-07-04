@@ -52,7 +52,7 @@ export function bucketSleepSegments(
   segments: SleepSegment[],
   periodStartMs: number,
   periodEndMs: number,
-  bucketMinutes = CHART_CONFIG.bucketMinutes,
+  bucketMinutes: number = CHART_CONFIG.bucketMinutes,
 ): SleepSegment[] {
   if (segments.length === 0 || periodEndMs <= periodStartMs) return []
 

@@ -12,7 +12,7 @@ import { renderHypnogramChart } from '@/components/hypnogram-chart'
 import {
   CARD_NAME,
   CARD_VERSION,
-  CHART_CONFIG,
+  clampBucketMinutes,
   DEFAULT_STATE_MAPPING,
 } from '@/const'
 import '@/hypnogram-card-editor'
@@ -42,8 +42,8 @@ export class HypnogramCard extends LitElement {
   @state() private config!: HypnogramCardConfig
   @state() private _segments: SleepSegment[] = []
   @state() private _rawSegments: SleepSegment[] = []
-  @state() private _periodStartMs = 0
-  @state() private _periodEndMs = 0
+  @state() private _periodStartMs?: number
+  @state() private _periodEndMs?: number
   @state() private _loading = false
   private _lastEntityId?: string
   private _lastState?: string
@@ -104,10 +104,15 @@ export class HypnogramCard extends LitElement {
   }
 
   private _getBucketMinutes(): number {
-    return this.config.bucket_minutes ?? CHART_CONFIG.bucketMinutes
+    return clampBucketMinutes(this.config.bucket_minutes)
   }
 
   private _applyBucketedSegments(): void {
+    if (this._periodStartMs === undefined || this._periodEndMs === undefined) {
+      this._segments = []
+      return
+    }
+
     this._segments = bucketSleepSegments(
       this._rawSegments,
       this._periodStartMs,

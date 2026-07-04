@@ -41,4 +41,14 @@ export const CHART_CONFIG = {
   height: 168,
   padding: { top: 0, right: 0, bottom: 0, left: 0 },
   bucketMinutes: 30,
+  bucketMinutesMin: 1,
+  bucketMinutesMax: 30,
+} as const
+
+export function clampBucketMinutes(value?: number): number {
+  const minutes = value ?? CHART_CONFIG.bucketMinutes
+  return Math.min(
+    CHART_CONFIG.bucketMinutesMax,
+    Math.max(CHART_CONFIG.bucketMinutesMin, minutes),
+  )
 }

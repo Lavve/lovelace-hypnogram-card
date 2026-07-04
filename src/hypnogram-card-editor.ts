@@ -1,7 +1,11 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import { html, LitElement, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
-import { CHART_CONFIG, DEFAULT_STATE_MAPPING } from '@/const'
+import {
+  CHART_CONFIG,
+  clampBucketMinutes,
+  DEFAULT_STATE_MAPPING,
+} from '@/const'
 import { localize } from '@/localize'
 import { editorStyles } from '@/styles'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
@@ -27,7 +31,7 @@ export class HypnogramCardEditor extends LitElement {
       show_labels: config.show_labels ?? false,
       legend_position: config.legend_position ?? 'left',
       primary_color: config.primary_color ?? DEFAULT_PRIMARY_COLOR,
-      bucket_minutes: config.bucket_minutes ?? CHART_CONFIG.bucketMinutes,
+      bucket_minutes: clampBucketMinutes(config.bucket_minutes),
       tap_action: config.tap_action ?? { action: 'more-info' },
       hold_action: config.hold_action ?? { action: 'none' },
       double_tap_action: config.double_tap_action ?? { action: 'none' },
@@ -121,7 +125,14 @@ export class HypnogramCardEditor extends LitElement {
           {
             name: 'bucket_minutes',
             default: CHART_CONFIG.bucketMinutes,
-            selector: { number: { min: 1, max: 60, step: 1, mode: 'box' } },
+            selector: {
+              number: {
+                min: CHART_CONFIG.bucketMinutesMin,
+                max: CHART_CONFIG.bucketMinutesMax,
+                step: 1,
+                mode: 'box',
+              },
+            },
           },
         ],
       },

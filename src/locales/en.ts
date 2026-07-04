@@ -28,7 +28,7 @@ export default {
   'editor.chart_configuration_label': 'Chart configuration',
   'editor.bucket_minutes_label': 'Bucket size (minutes)',
   'editor.bucket_minutes_helper':
-    'Groups short phase changes into time buckets. Higher values smooth the chart.',
+    'Groups short phase changes into time buckets. Higher values smooth the chart. Can be set to 1-30 minutes.',
   'editor.tap_action_label': 'Tap action',
   'editor.hold_action_label': 'Hold action',
   'editor.double_tap_action_label': 'Double tap action',
