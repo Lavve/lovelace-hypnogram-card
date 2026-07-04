@@ -95,7 +95,8 @@ export const cardStyles = css`
     font-size: var(--ha-font-size-s);
     line-height: 1.2;
     color: var(--secondary-text-color, #9e9e9e);
-    position: relative;
+    position: absolute;
+    height: 100%;
     z-index: 1;
   }
   .chart-container.legend-left .legends {
