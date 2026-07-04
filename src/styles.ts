@@ -97,8 +97,6 @@ export const cardStyles = css`
     color: var(--secondary-text-color, #9e9e9e);
     position: relative;
     z-index: 1;
-    position: absolute;
-    height: 100%;
   }
   .chart-container.legend-left .legends {
     text-align: left;
