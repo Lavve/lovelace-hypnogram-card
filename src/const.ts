@@ -37,10 +37,8 @@ export const DEFAULT_STATE_MAPPING: HypnogramCardStateMapping = {
   ...SLEEP_AS_ANDROID.stateMapping,
 }
 
-export const CHART_BAR_COLOR = '#4a7eb8'
-
 export const CHART_CONFIG = {
-  height: 150,
-  padding: { top: 8, right: 8, bottom: 28, left: 72 },
-  barHeightRatio: 0.6,
+  height: 168,
+  padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  bucketMinutes: 30,
 }

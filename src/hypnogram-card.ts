@@ -1,15 +1,29 @@
 import type { HomeAssistant } from 'custom-card-helpers'
+import {
+  handleAction,
+  hasAction,
+  hasDoubleClick,
+  type ActionHandlerEvent,
+} from 'custom-card-helpers'
 import { html, LitElement, type PropertyValues, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
+import { actionHandler } from '@/action-handler-directive'
 import { renderHypnogramChart } from '@/components/hypnogram-chart'
-import { CARD_NAME, CARD_VERSION, DEFAULT_STATE_MAPPING } from '@/const'
+import {
+  CARD_NAME,
+  CARD_VERSION,
+  CHART_CONFIG,
+  DEFAULT_STATE_MAPPING,
+} from '@/const'
 import '@/hypnogram-card-editor'
 import { localize } from '@/localize'
 import { fetchSleepHistory, processSleepHistory } from '@/services/history'
 import { cardStyles, chartStyles } from '@/styles'
 import type { HypnogramCardConfig, SleepSegment } from '@/types'
-import { logCardBanner, logHistoryReport } from '@/utils/debug'
-import { buildSleepSegments } from '@/utils/segments'
+import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
+import { logCardBanner } from '@/utils/debug'
+import { bucketSleepSegments, buildSleepSegments } from '@/utils/segments'
+import { formatPeriodRange } from '@/utils/time'
 
 declare global {
   interface Window {
@@ -27,21 +41,28 @@ export class HypnogramCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant
   @state() private config!: HypnogramCardConfig
   @state() private _segments: SleepSegment[] = []
+  @state() private _rawSegments: SleepSegment[] = []
   @state() private _periodStartMs = 0
   @state() private _periodEndMs = 0
   @state() private _loading = false
   private _lastEntityId?: string
   private _lastState?: string
+  private _lastBucketMinutes?: number
   private _fetchGeneration = 0
 
   public static getConfigElement(): HTMLElement {
     return document.createElement('hypnogram-card-editor')
   }
 
-  public static getStubConfig(): Record<string, string> {
+  public static getStubConfig(): Record<string, unknown> {
     return {
+      type: 'custom:hypnogram-card',
       title: '',
       entity: '',
+      grid_options: {
+        rows: 4,
+        columns: 12,
+      },
     }
   }
 
@@ -65,71 +86,57 @@ export class HypnogramCard extends LitElement {
 
     const entityChanged = this._lastEntityId !== entityId
     const stateChanged = this._lastState !== currentState
+    const bucketMinutes = this._getBucketMinutes()
+    const bucketChanged = this._lastBucketMinutes !== bucketMinutes
     const needsInitialFetch = this._lastEntityId === undefined
+
+    if (bucketChanged && this._rawSegments.length > 0) {
+      this._lastBucketMinutes = bucketMinutes
+      this._applyBucketedSegments()
+    }
 
     if (entityChanged || stateChanged || needsInitialFetch) {
       this._lastEntityId = entityId
       this._lastState = currentState
+      this._lastBucketMinutes = bucketMinutes
       void this._updateHistory(entityId)
     }
   }
 
+  private _getBucketMinutes(): number {
+    return this.config.bucket_minutes ?? CHART_CONFIG.bucketMinutes
+  }
+
+  private _applyBucketedSegments(): void {
+    this._segments = bucketSleepSegments(
+      this._rawSegments,
+      this._periodStartMs,
+      this._periodEndMs,
+      this._getBucketMinutes(),
+    )
+  }
+
+  private _handleAction(ev: ActionHandlerEvent): void {
+    handleAction(this, this.hass, this.config, ev.detail.action)
+  }
+
   private async _updateHistory(entityId: string): Promise<void> {
     const generation = ++this._fetchGeneration
-    const debug = this.config.debug ?? false
     this._loading = true
 
-    const fetchReport = debug
-      ? {
-          startTime: '',
-          hoursAgo: 0,
-          responseKeys: [] as string[],
-          rawCount: 0,
-          uniqueRawStates: [] as string[],
-        }
-      : undefined
-
-    const processReport = debug
-      ? {
-          stateMapping: this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
-          reverseMapping: {},
-          normalizedCount: 0,
-          droppedCount: 0,
-          uniqueStates: [] as string[],
-          sleepWindow: { startIndex: 0, stopIndex: 0 },
-          phasePoints: 0,
-          warnings: [] as string[],
-        }
-      : undefined
-
     try {
-      const historyData = await fetchSleepHistory(
-        this.hass,
-        entityId,
-        48,
-        fetchReport,
-      )
+      const historyData = await fetchSleepHistory(this.hass, entityId)
       if (generation !== this._fetchGeneration) return
 
       const history = processSleepHistory(
         historyData,
         this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
-        processReport,
       )
 
       this._periodStartMs = history.periodStart.getTime()
       this._periodEndMs = history.periodEnd.getTime()
-      this._segments = buildSleepSegments(history)
-
-      if (debug && fetchReport && processReport) {
-        logHistoryReport(
-          entityId,
-          this.hass.states[entityId]?.state,
-          this._segments.length,
-          fetchReport,
-          processReport,
-        )
-      }
+      this._rawSegments = buildSleepSegments(history)
+      this._applyBucketedSegments()
     } catch (e) {
       console.error('Error fetching sleep history:', e)
     } finally {
@@ -140,7 +147,15 @@ export class HypnogramCard extends LitElement {
   }
 
   public getCardSize(): number {
-    return 3
+    return 4
+  }
+
+  public getGridOptions() {
+    return {
+      rows: 4,
+      columns: 12,
+      min_rows: 4,
+    }
   }
 
   protected render(): TemplateResult {
@@ -153,39 +168,59 @@ export class HypnogramCard extends LitElement {
 
     if (!stateObj) {
       return html`
-        <ha-card class="error">
-          <div class="card-content">
-            ${localize('card.error_entity_not_found', this.hass)}: ${entityId}
-          </div>
-        </ha-card>
+        <div class="card error">
+          ${localize('card.error_entity_not_found', this.hass)}: ${entityId}
+        </div>
       `
     }
 
     const title = this.config.title || localize('card.title', this.hass)
+    const locale = this.hass.locale?.language
+    const periodRange = formatPeriodRange(
+      this._periodStartMs,
+      this._periodEndMs,
+      locale,
+    )
+
+    const interactive =
+      hasAction(this.config.tap_action) ||
+      hasAction(this.config.hold_action) ||
+      hasDoubleClick(this.config.double_tap_action)
 
     return html`
-      <ha-card>
-        <div class="card-content">
+      <div
+        class="card${interactive ? ' interactive' : ''}"
+        @action=${this._handleAction}
+        ${actionHandler({
+          hasHold: hasAction(this.config.hold_action),
+          hasDoubleClick: hasDoubleClick(this.config.double_tap_action),
+        })}
+        tabindex=${interactive ? '0' : '-1'}
+      >
+        <div class="header-row">
           <div class="header">${title}</div>
-          <div class="chart-area">
-            ${renderHypnogramChart(
-              this._segments,
-              this._periodStartMs,
-              this._periodEndMs,
-              this.hass,
-            )}
-            ${
-              this._loading
-                ? html`
-                  <div class="loading-overlay">
-                    ${localize('card.loading', this.hass)}
-                  </div>
-                `
-                : ''
-            }
-          </div>
+          ${periodRange ? html`<div class="period-range">${periodRange}</div>` : ''}
         </div>
-      </ha-card>
+        <div class="chart-area">
+          ${renderHypnogramChart(
+            this._segments,
+            this._periodStartMs,
+            this._periodEndMs,
+            this.hass,
+            this.config.primary_color ?? DEFAULT_PRIMARY_COLOR,
+            this,
+          )}
+          ${
+            this._loading
+              ? html`
+                <div class="loading-overlay">
+                  ${localize('card.loading', this.hass)}
+                </div>
+              `
+              : ''
+          }
+        </div>
+      </div>
     `
   }
 

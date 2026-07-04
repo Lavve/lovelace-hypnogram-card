@@ -1,17 +1,27 @@
-import type { LovelaceCardConfig } from 'custom-card-helpers'
+import type { ActionConfig, LovelaceCardConfig } from 'custom-card-helpers'
 
 export interface HypnogramCardConfig extends LovelaceCardConfig {
   type: string
   entity: string
   title?: string
-  debug?: boolean
+  primary_color?: string
+  bucket_minutes?: number
+  tap_action?: ActionConfig
+  hold_action?: ActionConfig
+  double_tap_action?: ActionConfig
   state_mapping?: HypnogramCardStateMapping
 }
 
 export interface HaFormSchemaField {
-  name: string
+  name?: string
+  type?: 'grid' | 'expandable' | 'constant' | 'divider' | 'section'
+  title?: string
+  icon?: string
   required?: boolean
-  selector: Record<string, unknown>
+  default?: unknown
+  flatten?: boolean
+  selector?: Record<string, unknown>
+  schema?: HaFormSchemaField[]
 }
 
 export type SleepPhase = 'awake' | 'rem' | 'light_sleep' | 'deep_sleep'
@@ -60,29 +70,6 @@ export interface ProcessedSleepHistory {
   periodEnd: Date
 }
 
-export interface HistoryFetchReport {
-  startTime: string
-  hoursAgo: number
-  responseKeys: string[]
-  rawCount: number
-  uniqueRawStates: string[]
-  firstEntry?: HistoryState
-  lastEntry?: HistoryState
-}
-
-export interface HistoryProcessReport {
-  stateMapping: HypnogramCardStateMapping
-  reverseMapping: Record<string, string>
-  normalizedCount: number
-  droppedCount: number
-  uniqueStates: string[]
-  sleepWindow: { startIndex: number; stopIndex: number }
-  phasePoints: number
-  periodStart?: string
-  periodEnd?: string
-  warnings: string[]
-}
-
 export interface ChartPadding {
   top: number
   right: number
@@ -98,4 +85,8 @@ export interface ChartDimensions {
   plotHeight: number
   levelHeight: number
   barHeight: number
+}
+
+export interface ChartPalette {
+  phaseColors: Record<SleepPhase, string>
 }

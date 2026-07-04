@@ -1,9 +1,18 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import { html, LitElement, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
+import { CHART_CONFIG, DEFAULT_STATE_MAPPING } from '@/const'
 import { localize } from '@/localize'
 import { editorStyles } from '@/styles'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
+import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
+
+const STATE_MAPPING_PHASES = [
+  'deep_sleep',
+  'light_sleep',
+  'rem',
+  'awake',
+] as const
 
 @customElement('hypnogram-card-editor')
 export class HypnogramCardEditor extends LitElement {
@@ -11,7 +20,18 @@ export class HypnogramCardEditor extends LitElement {
   @state() private _config!: HypnogramCardConfig
 
   public setConfig(config: HypnogramCardConfig): void {
-    this._config = config
+    this._config = {
+      ...config,
+      primary_color: config.primary_color ?? DEFAULT_PRIMARY_COLOR,
+      bucket_minutes: config.bucket_minutes ?? CHART_CONFIG.bucketMinutes,
+      tap_action: config.tap_action ?? { action: 'more-info' },
+      hold_action: config.hold_action ?? { action: 'none' },
+      double_tap_action: config.double_tap_action ?? { action: 'none' },
+      state_mapping: {
+        ...DEFAULT_STATE_MAPPING,
+        ...config.state_mapping,
+      },
+    }
   }
 
   private get _schema(): HaFormSchemaField[] {
@@ -30,8 +50,40 @@ export class HypnogramCardEditor extends LitElement {
         selector: { entity: { include_entities: entities } },
       },
       {
-        name: 'debug',
-        selector: { boolean: {} },
+        type: 'expandable',
+        name: 'state_mapping',
+        icon: 'mdi:sleep',
+        schema: STATE_MAPPING_PHASES.map((phase) => ({
+          name: phase,
+          required: true,
+          default: DEFAULT_STATE_MAPPING[phase],
+          selector: { text: {} },
+        })),
+      },
+      {
+        name: 'primary_color',
+        default: DEFAULT_PRIMARY_COLOR,
+        selector: { text: {} },
+      },
+      {
+        name: 'bucket_minutes',
+        default: CHART_CONFIG.bucketMinutes,
+        selector: { number: { min: 1, max: 60, step: 1, mode: 'box' } },
+      },
+      {
+        name: 'tap_action',
+        default: { action: 'more-info' },
+        selector: { ui_action: { default_action: 'more-info' } },
+      },
+      {
+        name: 'hold_action',
+        default: { action: 'none' },
+        selector: { ui_action: {} },
+      },
+      {
+        name: 'double_tap_action',
+        default: { action: 'none' },
+        selector: { ui_action: {} },
       },
     ]
   }
@@ -46,9 +98,37 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.title_label', this.hass)
       if (schema.name === 'entity')
         return localize('editor.entity_label', this.hass)
-      if (schema.name === 'debug')
-        return localize('editor.debug_label', this.hass)
-      return schema.name
+      if (schema.name === 'primary_color')
+        return localize('editor.primary_color_label', this.hass)
+      if (schema.name === 'bucket_minutes')
+        return localize('editor.bucket_minutes_label', this.hass)
+      if (schema.name === 'tap_action')
+        return localize('editor.tap_action_label', this.hass)
+      if (schema.name === 'hold_action')
+        return localize('editor.hold_action_label', this.hass)
+      if (schema.name === 'double_tap_action')
+        return localize('editor.double_tap_action_label', this.hass)
+      if (schema.name === 'state_mapping')
+        return localize('editor.state_mapping_label', this.hass)
+      if (
+        schema.name &&
+        STATE_MAPPING_PHASES.includes(
+          schema.name as (typeof STATE_MAPPING_PHASES)[number],
+        )
+      ) {
+        return localize(`editor.state_mapping.${schema.name}`, this.hass)
+      }
+      return schema.name ?? ''
+    }
+
+    const computeHelper = (schema: HaFormSchemaField) => {
+      if (schema.name === 'primary_color')
+        return localize('editor.primary_color_helper', this.hass)
+      if (schema.name === 'bucket_minutes')
+        return localize('editor.bucket_minutes_helper', this.hass)
+      if (schema.name === 'state_mapping')
+        return localize('editor.state_mapping_helper', this.hass)
+      return undefined
     }
 
     return html`
@@ -57,6 +137,7 @@ export class HypnogramCardEditor extends LitElement {
         .data=${this._config}
         .schema=${this._schema}
         .computeLabel=${computeLabel}
+        .computeHelper=${computeHelper}
         @value-changed=${this._valueChanged}
       ></ha-form>
     `

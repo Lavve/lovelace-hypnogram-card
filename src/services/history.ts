@@ -1,14 +1,11 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import { PHASE_LEVELS, SLEEP_AS_ANDROID } from '@/const'
 import type {
-  HistoryFetchReport,
-  HistoryProcessReport,
   HistoryState,
   HypnogramCardStateMapping,
   ProcessedSleepHistory,
   SleepDataPoint,
 } from '@/types'
-import { uniqueRawStates } from '@/utils/debug'
 
 function reverseStateMapping(
   stateMapping: HypnogramCardStateMapping,
@@ -90,16 +87,10 @@ export async function fetchSleepHistory(
   hass: HomeAssistant,
   entityId: string,
   hoursAgo = 48,
-  report?: HistoryFetchReport,
 ): Promise<HistoryState[]> {
   const startTime = new Date(
     Date.now() - hoursAgo * 60 * 60 * 1000,
   ).toISOString()
-
-  if (report) {
-    report.startTime = startTime
-    report.hoursAgo = hoursAgo
-  }
 
   try {
     const response = await hass.callWS<Record<string, HistoryState[]>>({
@@ -111,35 +102,14 @@ export async function fetchSleepHistory(
       significant_changes_only: false,
     })
 
-    if (report) {
-      report.responseKeys = Object.keys(response ?? {})
-    }
-
     if (!(entityId in response)) {
-      if (report) {
-        report.rawCount = 0
-        report.uniqueRawStates = []
-      }
       return []
     }
 
     const rawData = response[entityId]
-    const history = Array.isArray(rawData) ? rawData : []
-
-    if (report) {
-      report.rawCount = history.length
-      report.uniqueRawStates = uniqueRawStates(history)
-      report.firstEntry = history[0]
-      report.lastEntry = history[history.length - 1]
-    }
-
-    return history
+    return Array.isArray(rawData) ? rawData : []
   } catch (error) {
     console.error('Failed to fetch sleep history from HA WebSocket API:', error)
-    if (report) {
-      report.rawCount = 0
-      report.uniqueRawStates = []
-    }
     return []
   }
 }
@@ -147,7 +117,6 @@ export async function fetchSleepHistory(
 export function processSleepHistory(
   rawHistory: HistoryState[],
   stateMapping: HypnogramCardStateMapping,
-  report?: HistoryProcessReport,
 ): ProcessedSleepHistory {
   const empty: ProcessedSleepHistory = {
     points: [],
@@ -155,33 +124,9 @@ export function processSleepHistory(
     periodEnd: new Date(),
   }
 
-  const warnings: string[] = []
-
-  if (report) {
-    report.stateMapping = stateMapping
-    report.warnings = warnings
-  }
-
-  if (rawHistory.length === 0) {
-    warnings.push('no raw history to process')
-    if (report) {
-      report.normalizedCount = 0
-      report.droppedCount = 0
-      report.uniqueStates = []
-      report.sleepWindow = { startIndex: 0, stopIndex: 0 }
-      report.phasePoints = 0
-    }
-    return empty
-  }
+  if (rawHistory.length === 0) return empty
 
   const reverseMapping = reverseStateMapping(stateMapping)
-  if (report) {
-    report.reverseMapping = reverseMapping
-  }
-
-  const dropped = rawHistory.filter(
-    (entry) => normalizeHistoryState(entry, reverseMapping) === null,
-  )
 
   const sortedPoints = rawHistory
     .map((entry) => normalizeHistoryState(entry, reverseMapping))
@@ -190,26 +135,9 @@ export function processSleepHistory(
     )
     .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
-  if (report) {
-    report.normalizedCount = sortedPoints.length
-    report.droppedCount = dropped.length
-    report.uniqueStates = [...new Set(sortedPoints.map((point) => point.state))]
-  }
-
-  if (sortedPoints.length === 0) {
-    warnings.push('no entries survived normalization')
-    if (report) {
-      report.sleepWindow = { startIndex: 0, stopIndex: 0 }
-      report.phasePoints = 0
-    }
-    return empty
-  }
+  if (sortedPoints.length === 0) return empty
 
   const { startIndex, stopIndex } = findSleepWindow(sortedPoints)
-  if (report) {
-    report.sleepWindow = { startIndex, stopIndex }
-  }
-
   let sleepPeriod = sortedPoints.slice(startIndex, stopIndex + 1)
 
   let points: SleepDataPoint[] = sleepPeriod
@@ -221,7 +149,6 @@ export function processSleepHistory(
     }))
 
   if (points.length === 0) {
-    warnings.push('no phase points in sleep window, fell back to full history')
     points = sortedPoints
       .filter((point) => isPhaseState(point.state))
       .map((point) => ({
@@ -232,24 +159,12 @@ export function processSleepHistory(
     sleepPeriod = sortedPoints
   }
 
-  if (points.length === 0) {
-    warnings.push('no phase points matched PHASE_LEVELS')
-    if (report) {
-      report.phasePoints = 0
-    }
-    return empty
-  }
+  if (points.length === 0) return empty
 
   const periodStart = points[0].timestamp
   const periodEnd =
     sleepPeriod[sleepPeriod.length - 1]?.timestamp ??
     points[points.length - 1].timestamp
-
-  if (report) {
-    report.phasePoints = points.length
-    report.periodStart = periodStart.toISOString()
-    report.periodEnd = periodEnd.toISOString()
-  }
 
   return { points, periodStart, periodEnd }
 }

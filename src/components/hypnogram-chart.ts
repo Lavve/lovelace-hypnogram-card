@@ -1,113 +1,104 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import { html, type TemplateResult } from 'lit'
-import {
-  CHART_BAR_COLOR,
-  CHART_CONFIG,
-  PHASE_LEVELS,
-  SLEEP_PHASES,
-} from '@/const'
+import { styleMap } from 'lit/directives/style-map.js'
+import { CHART_CONFIG } from '@/const'
 import { localize } from '@/localize'
-import type { SleepSegment } from '@/types'
+import { buildChartPalette } from '@/styles'
+import type { ChartPalette, SleepSegment } from '@/types'
 import {
+  buildCompressedLayout,
+  getAdjacentBarSegments,
+  getAwakeLineAtX,
+  getBarStepRadii,
   getChartDimensions,
-  getSegmentRect,
-  levelToY,
-  timeToX,
+  getLayoutSegmentRect,
 } from '@/utils/chart'
-import { formatTime, getTimeTicks } from '@/utils/time'
+
+function getPhaseColor(palette: ChartPalette, state: string): string {
+  return (
+    palette.phaseColors[state as keyof ChartPalette['phaseColors']] ??
+    palette.phaseColors.light_sleep
+  )
+}
 
 export function renderHypnogramChart(
   segments: SleepSegment[],
-  periodStartMs: number,
-  periodEndMs: number,
+  _periodStartMs: number,
+  _periodEndMs: number,
   hass?: HomeAssistant,
+  primaryColor?: string,
+  context?: HTMLElement,
 ): TemplateResult {
-  const width = 400
-  const dims = getChartDimensions(width, CHART_CONFIG.height)
-  const locale = hass?.locale?.language
-  const hasData = segments.length > 0 && periodEndMs > periodStartMs
+  const palette = buildChartPalette(primaryColor, context)
+  const dims = getChartDimensions(400, CHART_CONFIG.height)
+  const layout = buildCompressedLayout(segments)
+  const hasData =
+    layout.layoutEndMs > 0 &&
+    (layout.bars.length > 0 || layout.awakeLineMs.length > 0)
 
-  const chartStartMs = hasData ? periodStartMs : Date.now() - 8 * 60 * 60 * 1000
-  const chartEndMs = hasData ? periodEndMs : Date.now()
+  const sleepBars = layout.bars.map((segment, index) => {
+    const { prev, next } = getAdjacentBarSegments(layout.bars, index)
+    const stepRadii = getBarStepRadii(segment, prev, next)
+    const rect = getLayoutSegmentRect(
+      segment,
+      layout.layoutStartMs,
+      layout.layoutEndMs,
+      dims,
+    )
+    const barStyle = {
+      position: 'absolute',
+      left: `${(rect.x / dims.width) * 100}%`,
+      top: `${(rect.y / dims.height) * 100}%`,
+      width: `${Math.max((rect.width / dims.width) * 100, 0.2)}%`,
+      height: `${(rect.height / dims.height) * 100}%`,
+      backgroundColor: getPhaseColor(palette, segment.state),
+      ...stepRadii,
+    } as const
 
-  const bars = hasData
-    ? segments.map((segment) => {
-        const rect = getSegmentRect(segment, periodStartMs, periodEndMs, dims)
-        return html`
-          <rect
-            x=${rect.x}
-            y=${rect.y}
-            width=${rect.width}
-            height=${rect.height}
-            rx="2"
-            fill=${CHART_BAR_COLOR}
-          />
-        `
-      })
-    : []
-
-  const phaseLabels = SLEEP_PHASES.map((phase) => {
-    const level = PHASE_LEVELS[phase]
-    const y = levelToY(level, dims) + dims.levelHeight / 2
-
-    return html`
-      <text
-        x=${dims.padding.left - 8}
-        y=${y}
-        text-anchor="end"
-        dominant-baseline="middle"
-        class="phase-label"
-      >
-        ${localize(`card.phase.${phase}`, hass)}
-      </text>
-    `
+    return html`<div class="bar" style=${styleMap(barStyle)}></div>`
   })
 
-  const timeTicks = getTimeTicks(chartStartMs, chartEndMs)
-  const timeLabels = timeTicks.map((tickMs) => {
-    const x = timeToX(tickMs, chartStartMs, chartEndMs, dims)
-    return html`
-      <text
-        x=${x}
-        y=${dims.height - 6}
-        text-anchor="middle"
-        class="time-label"
-      >
-        ${formatTime(new Date(tickMs), locale)}
-      </text>
-    `
-  })
+  const awakeLines = layout.awakeLineMs.map((layoutMs) => {
+    const rect = getAwakeLineAtX(
+      layoutMs,
+      layout.layoutStartMs,
+      layout.layoutEndMs,
+      dims,
+    )
+    const lineStyle = {
+      position: 'absolute',
+      left: `${(rect.x / dims.width) * 100}%`,
+      top: `${(rect.y / dims.height) * 100}%`,
+      width: '2px',
+      height: `${(rect.height / dims.height) * 100}%`,
+      backgroundColor: palette.phaseColors.awake,
+    } as const
 
-  const gridLines = SLEEP_PHASES.map((phase) => {
-    const level = PHASE_LEVELS[phase]
-    const y = levelToY(level, dims) + dims.levelHeight
-
-    return html`
-      <line
-        x1=${dims.padding.left}
-        y1=${y}
-        x2=${dims.padding.left + dims.plotWidth}
-        y2=${y}
-        class="grid-line"
-      />
-    `
+    return html`<div class="awake-line" style=${styleMap(lineStyle)}></div>`
   })
 
   return html`
-    <div class="chart-container">
-      <svg
-        width=${dims.width}
-        height=${dims.height}
-        viewBox="0 0 ${dims.width} ${dims.height}"
-        class="chart"
-        role="img"
-        aria-label=${localize('card.title', hass)}
+    <div
+      class="chart-container"
+      style=${styleMap({
+        position: 'relative',
+        width: '100%',
+        height: `${dims.height}px`,
+        minHeight: `${dims.height}px`,
+        borderRadius: '8px',
+        overflow: 'hidden',
+      })}
+    >
+      <div
+        class="plot"
+        style=${styleMap({
+          position: 'absolute',
+          inset: '0',
+        })}
       >
-        ${gridLines}
-        ${bars}
-        ${phaseLabels}
-        ${timeLabels}
-      </svg>
+        ${sleepBars}
+        ${awakeLines}
+      </div>
       ${
         hasData
           ? ''

@@ -6,6 +6,16 @@ export function formatTime(date: Date, locale?: string): string {
   })
 }
 
+export function formatPeriodRange(
+  startMs: number,
+  endMs: number,
+  locale?: string,
+): string {
+  if (!startMs || !endMs || endMs <= startMs) return ''
+
+  return `${formatTime(new Date(startMs), locale)} — ${formatTime(new Date(endMs), locale)}`
+}
+
 export function getTimeTicks(
   startMs: number,
   endMs: number,

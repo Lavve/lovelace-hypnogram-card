@@ -1,3 +1,4 @@
+import { CHART_CONFIG } from '@/const'
 import type { ProcessedSleepHistory, SleepSegment } from '@/types'
 
 export function buildSleepSegments(
@@ -26,4 +27,84 @@ export function buildSleepSegments(
   }
 
   return segments
+}
+
+function mergeAdjacentSegments(segments: SleepSegment[]): SleepSegment[] {
+  if (segments.length === 0) return []
+
+  const merged: SleepSegment[] = [{ ...segments[0] }]
+
+  for (let i = 1; i < segments.length; i++) {
+    const previous = merged[merged.length - 1]
+    const current = segments[i]
+
+    if (current.state === previous.state) {
+      previous.endMs = current.endMs
+    } else {
+      merged.push({ ...current })
+    }
+  }
+
+  return merged
+}
+
+export function bucketSleepSegments(
+  segments: SleepSegment[],
+  periodStartMs: number,
+  periodEndMs: number,
+  bucketMinutes = CHART_CONFIG.bucketMinutes,
+): SleepSegment[] {
+  if (segments.length === 0 || periodEndMs <= periodStartMs) return []
+
+  const bucketMs = bucketMinutes * 60 * 1000
+  const buckets: SleepSegment[] = []
+
+  for (
+    let bucketStart = periodStartMs;
+    bucketStart < periodEndMs;
+    bucketStart += bucketMs
+  ) {
+    const bucketEnd = Math.min(bucketStart + bucketMs, periodEndMs)
+    const phaseDurations = new Map<
+      string,
+      { level: number; duration: number }
+    >()
+
+    for (const segment of segments) {
+      const overlapStart = Math.max(segment.startMs, bucketStart)
+      const overlapEnd = Math.min(segment.endMs, bucketEnd)
+      if (overlapEnd <= overlapStart) continue
+
+      const duration = overlapEnd - overlapStart
+      const existing = phaseDurations.get(segment.state)
+
+      if (existing) {
+        existing.duration += duration
+      } else {
+        phaseDurations.set(segment.state, {
+          level: segment.level,
+          duration,
+        })
+      }
+    }
+
+    if (phaseDurations.size === 0) continue
+
+    let dominant = { state: '', level: 0, duration: 0 }
+
+    for (const [state, { level, duration }] of phaseDurations) {
+      if (duration > dominant.duration) {
+        dominant = { state, level, duration }
+      }
+    }
+
+    buckets.push({
+      state: dominant.state,
+      level: dominant.level,
+      startMs: bucketStart,
+      endMs: bucketEnd,
+    })
+  }
+
+  return mergeAdjacentSegments(buckets)
 }
