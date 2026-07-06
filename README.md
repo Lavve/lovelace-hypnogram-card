@@ -138,7 +138,7 @@ state_mapping:
 
 ### Dynamic chart color (template)
 
-`primary_color` can be a Jinja2 template. In the visual editor, type `{{` in the chart color field to switch to template mode (remove `{{` to switch back to a static color).
+`primary_color` can be a Jinja2 template. In the visual editor, type `{{` or `{%` in the chart color field to switch to template mode (remove Jinja syntax to switch back to a static color).
 
 The card exposes the full card config as `config` in templates, so you can reference `config.entity` and any other Home Assistant template helpers (`states()`, `is_state()`, etc.).
 

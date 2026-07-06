@@ -20,7 +20,7 @@ export default {
   'editor.entity_label': 'Sleep Data Entity (Required)',
   'editor.primary_color_label': 'Chart color',
   'editor.primary_color_helper':
-    'Hex, RGB or CSS variables. Phase colors are derived from this. Type {{ to use a template.',
+    'Hex, RGB or CSS variables. Phase colors are derived from this. Type {{ or {% to use a template.',
   'editor.primary_color_template_helper':
     'Jinja2 template returning a color (hex, RGB, or CSS variable). The config variable is available.',
   'editor.chart_configuration_label': 'Chart configuration',
