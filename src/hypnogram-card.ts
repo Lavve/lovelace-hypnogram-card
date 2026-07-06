@@ -1,6 +1,7 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import {
   type ActionHandlerEvent,
+  deepEqual,
   handleAction,
   hasAction,
   hasDoubleClick,
@@ -23,6 +24,7 @@ import type { HypnogramCardConfig, SleepSegment } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
 import { logCardBanner } from '@/utils/debug'
 import { bucketSleepSegments, buildSleepSegments } from '@/utils/segments'
+import { isJinjaTemplate, subscribeRenderTemplate } from '@/utils/template'
 import { formatPeriodRange } from '@/utils/time'
 
 declare global {
@@ -45,10 +47,14 @@ export class HypnogramCard extends LitElement {
   @state() private _periodStartMs?: number
   @state() private _periodEndMs?: number
   @state() private _loading = false
+  @state() private _resolvedPrimaryColor?: string
   private _lastEntityId?: string
   private _lastState?: string
   private _lastBucketMinutes?: number
   private _fetchGeneration = 0
+  private _primaryColorTemplate?: string
+  private _subscribedPrimaryColorConfig?: HypnogramCardConfig
+  private _unsubPrimaryColor?: Promise<() => void>
 
   public static getConfigElement(): HTMLElement {
     return document.createElement('hypnogram-card-editor')
@@ -70,16 +76,29 @@ export class HypnogramCard extends LitElement {
     if (!config.entity) {
       throw new Error('You must define an entity')
     }
-    this.config = {
+    const next: HypnogramCardConfig = {
       ...config,
       state_mapping: config.state_mapping || DEFAULT_STATE_MAPPING,
     }
+    if (this.config && deepEqual(this.config, next)) {
+      return
+    }
+    this.config = next
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback()
+    void this._unsubscribePrimaryColorTemplate()
   }
 
   protected updated(changedProperties: PropertyValues): void {
     super.updated(changedProperties)
 
     if (!this.hass || !this.config?.entity) return
+
+    if (changedProperties.has('hass') || changedProperties.has('config')) {
+      void this._syncPrimaryColorTemplate()
+    }
 
     const entityId = this.config.entity
     const currentState = this.hass.states[entityId]?.state
@@ -119,6 +138,67 @@ export class HypnogramCard extends LitElement {
       this._periodEndMs,
       this._getBucketMinutes(),
     )
+  }
+
+  private _getPrimaryColor(): string {
+    const configured = this.config.primary_color ?? DEFAULT_PRIMARY_COLOR
+    if (isJinjaTemplate(configured)) {
+      return this._resolvedPrimaryColor ?? DEFAULT_PRIMARY_COLOR
+    }
+    return configured
+  }
+
+  private async _unsubscribePrimaryColorTemplate(): Promise<void> {
+    if (!this._unsubPrimaryColor) return
+
+    try {
+      const unsub = await this._unsubPrimaryColor
+      unsub()
+    } catch {
+      // Connection may already be closed.
+    }
+
+    this._unsubPrimaryColor = undefined
+    this._primaryColorTemplate = undefined
+    this._subscribedPrimaryColorConfig = undefined
+  }
+
+  private async _syncPrimaryColorTemplate(): Promise<void> {
+    if (!this.hass || !this.config) return
+
+    const configured = this.config.primary_color ?? DEFAULT_PRIMARY_COLOR
+
+    if (!isJinjaTemplate(configured)) {
+      this._resolvedPrimaryColor = undefined
+      await this._unsubscribePrimaryColorTemplate()
+      return
+    }
+
+    if (
+      this._primaryColorTemplate === configured &&
+      this._subscribedPrimaryColorConfig !== undefined &&
+      deepEqual(this._subscribedPrimaryColorConfig, this.config) &&
+      this._unsubPrimaryColor !== undefined
+    ) {
+      return
+    }
+
+    await this._unsubscribePrimaryColorTemplate()
+    this._primaryColorTemplate = configured
+    this._subscribedPrimaryColorConfig = this.config
+
+    try {
+      this._unsubPrimaryColor = subscribeRenderTemplate(
+        this.hass,
+        configured,
+        (value) => {
+          this._resolvedPrimaryColor = value
+        },
+        { config: this.config },
+      )
+    } catch (error) {
+      console.error('hypnogram-card failed to subscribe to template:', error)
+    }
   }
 
   private _handleAction(ev: ActionHandlerEvent): void {
@@ -219,7 +299,7 @@ export class HypnogramCard extends LitElement {
           ${renderHypnogramChart(
             this._segments,
             this.hass,
-            this.config.primary_color ?? DEFAULT_PRIMARY_COLOR,
+            this._getPrimaryColor(),
             this.config.show_labels ?? false,
             this.config.legend_position ?? 'left',
             this,

@@ -9,6 +9,7 @@ import {
 import { localize } from '@/locales/localize'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
+import { isJinjaTemplate } from '@/utils/template'
 
 const STATE_MAPPING_PHASES = [
   'deep_sleep',
@@ -120,7 +121,9 @@ export class HypnogramCardEditor extends LitElement {
           {
             name: 'primary_color',
             default: DEFAULT_PRIMARY_COLOR,
-            selector: { text: {} },
+            selector: isJinjaTemplate(this._config.primary_color)
+              ? { template: {} }
+              : { text: {} },
           },
           {
             name: 'bucket_minutes',
@@ -210,8 +213,11 @@ export class HypnogramCardEditor extends LitElement {
     }
 
     const computeHelper = (schema: HaFormSchemaField) => {
-      if (schema.name === 'primary_color')
-        return localize('editor.primary_color_helper', this.hass)
+      if (schema.name === 'primary_color') {
+        return isJinjaTemplate(this._config.primary_color)
+          ? localize('editor.primary_color_template_helper', this.hass)
+          : localize('editor.primary_color_helper', this.hass)
+      }
       if (schema.name === 'bucket_minutes')
         return localize('editor.bucket_minutes_helper', this.hass)
       if (schema.name === 'state_mapping')

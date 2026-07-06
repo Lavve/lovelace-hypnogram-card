@@ -21,7 +21,7 @@ If you use another integration that reports sleep phases differently, you can re
 - Hypnogram chart with deep sleep, light sleep, REM, and awake phases
 - Optional title and sleep period time range (respects your HA 12h/24h setting)
 - Optional phase legend, positioned left or right
-- Chart color based on a single primary color — phase shades are derived automatically
+- Chart color based on a single primary color — phase shades are derived automatically (static value or Jinja2 template)
 - Bucket size (1–30 minutes) to smooth short phase changes
 - Tap, hold, and double-tap actions (e.g. open more-info)
 - Visual card editor with grouped settings
@@ -129,12 +129,36 @@ state_mapping:
 | `show_period_range` | boolean           | `true`                    | Show sleep start/end time in the header                                           |
 | `show_labels`       | boolean           | `false`                   | Show phase legend beside the chart                                                |
 | `legend_position`   | `left` \| `right` | `left`                    | Legend placement (only when labels are shown)                                     |
-| `primary_color`     | string            | `var(--primary-color)`    | Base chart color (hex, rgb, or CSS variable). Phase colors are derived from this. |
+| `primary_color`     | string            | `var(--primary-color)`    | Base chart color (hex, rgb, CSS variable, or Jinja2 template). Phase colors are derived from this. |
 | `bucket_minutes`    | number            | `30`                      | Group phase changes into time buckets (1–30 minutes) for a smoother chart         |
 | `tap_action`        | action            | `more-info`               | Action on tap                                                                     |
 | `hold_action`       | action            | `none`                    | Action on hold                                                                    |
 | `double_tap_action` | action            | `none`                    | Action on double tap                                                              |
 | `state_mapping`     | object            | Sleep as Android defaults | Maps entity states to internal phase names                                        |
+
+### Dynamic chart color (template)
+
+`primary_color` can be a Jinja2 template. In the visual editor, type `{{` in the chart color field to switch to template mode (remove `{{` to switch back to a static color).
+
+The card exposes the full card config as `config` in templates, so you can reference `config.entity` and any other Home Assistant template helpers (`states()`, `is_state()`, etc.).
+
+Example: color the chart by total sleep duration from a helper sensor — red if under 6 hours, orange if under 7 hours, otherwise green:
+
+```yaml
+type: custom:hypnogram-card
+entity: sensor.sleep_phases
+primary_color: >-
+  {% set hours = states('sensor.sleep_duration') | float(0) %}
+  {% if hours < 6 %}
+    red
+  {% elif hours < 7 %}
+    orange
+  {% else %}
+    green
+  {% endif %}
+```
+
+Replace `sensor.sleep_duration` with your own sensor that reports sleep length in hours (e.g. from Sleep as Android, a template sensor, or an integration attribute).
 
 ### State mapping
 

@@ -1,7 +1,7 @@
 import type { HypnogramCardStateMapping, SleepIntegrationPreset } from '@/types'
 
-export const CARD_NAME = 'HYPNOGRAM-CARD'
-export const CARD_VERSION = '0.0.1'
+export const CARD_NAME = 'Hypnogram Card'
+export const CARD_VERSION = '0.0.3'
 
 export const SLEEP_AS_ANDROID = {
   phaseLevels: {
