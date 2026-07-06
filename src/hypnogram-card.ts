@@ -176,7 +176,8 @@ export class HypnogramCard extends LitElement {
 
     if (
       this._primaryColorTemplate === configured &&
-      this._subscribedPrimaryColorConfig === this.config &&
+      this._subscribedPrimaryColorConfig !== undefined &&
+      deepEqual(this._subscribedPrimaryColorConfig, this.config) &&
       this._unsubPrimaryColor !== undefined
     ) {
       return
