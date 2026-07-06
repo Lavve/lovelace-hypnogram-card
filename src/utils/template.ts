@@ -1,7 +1,9 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 
 export function isJinjaTemplate(value: string | undefined): boolean {
-  return typeof value === 'string' && value.includes('{{')
+  return (
+    typeof value === 'string' && (value.includes('{{') || value.includes('{%'))
+  )
 }
 
 export function templateResultToString(result: unknown): string | undefined {
