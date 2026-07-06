@@ -76,10 +76,14 @@ export class HypnogramCard extends LitElement {
     if (!config.entity) {
       throw new Error('You must define an entity')
     }
-    this.config = {
+    const next: HypnogramCardConfig = {
       ...config,
       state_mapping: config.state_mapping || DEFAULT_STATE_MAPPING,
     }
+    if (this.config && deepEqual(this.config, next)) {
+      return
+    }
+    this.config = next
   }
 
   disconnectedCallback(): void {
@@ -172,8 +176,7 @@ export class HypnogramCard extends LitElement {
 
     if (
       this._primaryColorTemplate === configured &&
-      this._subscribedPrimaryColorConfig !== undefined &&
-      deepEqual(this._subscribedPrimaryColorConfig, this.config) &&
+      this._subscribedPrimaryColorConfig === this.config &&
       this._unsubPrimaryColor !== undefined
     ) {
       return
