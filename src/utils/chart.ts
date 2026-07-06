@@ -8,7 +8,6 @@ interface LayoutSegment extends SleepSegment {
 
 interface CompressedChartLayout {
   bars: LayoutSegment[]
-  awakeLineMs: number[]
   layoutStartMs: number
   layoutEndMs: number
 }
@@ -55,15 +54,9 @@ export function buildCompressedLayout(
   segments: SleepSegment[],
 ): CompressedChartLayout {
   const bars: LayoutSegment[] = []
-  const awakeLineMs: number[] = []
   let compressed = 0
 
   for (const segment of segments) {
-    if (segment.state === 'awake') {
-      awakeLineMs.push(compressed)
-      continue
-    }
-
     const duration = segment.endMs - segment.startMs
     if (duration <= 0) continue
 
@@ -77,7 +70,6 @@ export function buildCompressedLayout(
 
   return {
     bars,
-    awakeLineMs,
     layoutStartMs: 0,
     layoutEndMs: compressed,
   }
@@ -102,44 +94,14 @@ export function getLayoutSegmentRect(
   }
 }
 
-export function getAwakeLineAtX(
-  layoutMs: number,
-  layoutStartMs: number,
-  layoutEndMs: number,
-  dims: ChartDimensions,
-  lineWidthPx = 2,
-): { x: number; y: number; width: number; height: number } {
-  const x = timeToX(layoutMs, layoutStartMs, layoutEndMs, dims)
-
-  return {
-    x,
-    y: dims.padding.top,
-    width: lineWidthPx,
-    height: dims.plotHeight,
-  }
-}
-
 export function getAdjacentBarSegments(
   segments: SleepSegment[],
   index: number,
 ): { prev?: SleepSegment; next?: SleepSegment } {
-  let prev: SleepSegment | undefined
-  for (let i = index - 1; i >= 0; i--) {
-    if (segments[i].state !== 'awake') {
-      prev = segments[i]
-      break
-    }
+  return {
+    prev: index > 0 ? segments[index - 1] : undefined,
+    next: index < segments.length - 1 ? segments[index + 1] : undefined,
   }
-
-  let next: SleepSegment | undefined
-  for (let i = index + 1; i < segments.length; i++) {
-    if (segments[i].state !== 'awake') {
-      next = segments[i]
-      break
-    }
-  }
-
-  return { prev, next }
 }
 
 export function getBarStepRadii(

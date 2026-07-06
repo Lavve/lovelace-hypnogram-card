@@ -147,11 +147,6 @@ export const chartStyles = css`
     box-sizing: border-box;
     pointer-events: none;
   }
-  .awake-line {
-    box-sizing: border-box;
-    pointer-events: none;
-    z-index: 2;
-  }
   .empty-overlay {
     position: absolute;
     inset: 0;

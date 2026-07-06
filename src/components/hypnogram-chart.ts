@@ -8,7 +8,6 @@ import type { ChartPalette, LegendPosition, SleepSegment } from '@/types'
 import {
   buildCompressedLayout,
   getAdjacentBarSegments,
-  getAwakeLineAtX,
   getBarStepRadii,
   getChartDimensions,
   getLayoutSegmentRect,
@@ -32,11 +31,9 @@ export function renderHypnogramChart(
   const palette = buildChartPalette(primaryColor, context)
   const dims = getChartDimensions(400, CHART_CONFIG.height)
   const layout = buildCompressedLayout(segments)
-  const hasData =
-    layout.layoutEndMs > 0 &&
-    (layout.bars.length > 0 || layout.awakeLineMs.length > 0)
+  const hasData = layout.layoutEndMs > 0 && layout.bars.length > 0
 
-  const sleepBars = layout.bars.map((segment, index) => {
+  const bars = layout.bars.map((segment, index) => {
     const { prev, next } = getAdjacentBarSegments(layout.bars, index)
     const stepRadii = getBarStepRadii(segment, prev, next)
     const rect = getLayoutSegmentRect(
@@ -56,25 +53,6 @@ export function renderHypnogramChart(
     } as const
 
     return html`<div class="bar" style=${styleMap(barStyle)}></div>`
-  })
-
-  const awakeLines = layout.awakeLineMs.map((layoutMs) => {
-    const rect = getAwakeLineAtX(
-      layoutMs,
-      layout.layoutStartMs,
-      layout.layoutEndMs,
-      dims,
-    )
-    const lineStyle = {
-      position: 'absolute',
-      left: `${(rect.x / dims.width) * 100}%`,
-      top: `${(rect.y / dims.height) * 100}%`,
-      width: '2px',
-      height: `${(rect.height / dims.height) * 100}%`,
-      backgroundColor: palette.phaseColors.awake,
-    } as const
-
-    return html`<div class="awake-line" style=${styleMap(lineStyle)}></div>`
   })
 
   const labels = [
@@ -109,8 +87,7 @@ export function renderHypnogramChart(
       }
 
       <div class="plot">
-        ${sleepBars}
-        ${awakeLines}
+        ${bars}
       </div>
       ${
         hasData
