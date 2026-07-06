@@ -66,6 +66,8 @@ If you use another integration that reports sleep phases differently, you can re
 2. Search for **Hypnogram Card** and install it.
 3. Add the card resource if prompted, or reload your dashboard.
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Lavve&repository=lovelace-hypnogram-card)
+
 ### Manual
 
 1. Download `hypnogram-card.js` from the [latest release](https://github.com/Lavve/lovelace-hypnogram-card/releases) (or build it locally — see [Development](#development)).
