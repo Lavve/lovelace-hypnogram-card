@@ -78,8 +78,6 @@ export class HypnogramCard extends LitElement {
       ...config,
       state_mapping: config.state_mapping || DEFAULT_STATE_MAPPING,
     }
-    this._primaryColorTemplate = undefined
-    void this._syncPrimaryColorTemplate()
   }
 
   disconnectedCallback(): void {
@@ -92,7 +90,11 @@ export class HypnogramCard extends LitElement {
 
     if (!this.hass || !this.config?.entity) return
 
-    if (changedProperties.has('hass')) {
+    if (changedProperties.has('config')) {
+      this._primaryColorTemplate = undefined
+    }
+
+    if (changedProperties.has('hass') || changedProperties.has('config')) {
       void this._syncPrimaryColorTemplate()
     }
 
