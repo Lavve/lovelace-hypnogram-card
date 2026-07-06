@@ -52,6 +52,7 @@ export class HypnogramCard extends LitElement {
   private _lastBucketMinutes?: number
   private _fetchGeneration = 0
   private _primaryColorTemplate?: string
+  private _subscribedPrimaryColorConfig?: HypnogramCardConfig
   private _unsubPrimaryColor?: Promise<() => void>
 
   public static getConfigElement(): HTMLElement {
@@ -89,10 +90,6 @@ export class HypnogramCard extends LitElement {
     super.updated(changedProperties)
 
     if (!this.hass || !this.config?.entity) return
-
-    if (changedProperties.has('config')) {
-      this._primaryColorTemplate = undefined
-    }
 
     if (changedProperties.has('hass') || changedProperties.has('config')) {
       void this._syncPrimaryColorTemplate()
@@ -158,6 +155,7 @@ export class HypnogramCard extends LitElement {
 
     this._unsubPrimaryColor = undefined
     this._primaryColorTemplate = undefined
+    this._subscribedPrimaryColorConfig = undefined
   }
 
   private async _syncPrimaryColorTemplate(): Promise<void> {
@@ -173,6 +171,7 @@ export class HypnogramCard extends LitElement {
 
     if (
       this._primaryColorTemplate === configured &&
+      this._subscribedPrimaryColorConfig === this.config &&
       this._unsubPrimaryColor !== undefined
     ) {
       return
@@ -180,6 +179,7 @@ export class HypnogramCard extends LitElement {
 
     await this._unsubscribePrimaryColorTemplate()
     this._primaryColorTemplate = configured
+    this._subscribedPrimaryColorConfig = this.config
 
     try {
       this._unsubPrimaryColor = subscribeRenderTemplate(
