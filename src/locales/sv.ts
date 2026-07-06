@@ -20,7 +20,9 @@ export default {
   'editor.entity_label': 'Sömndata Entitet (Krav)',
   'editor.primary_color_label': 'Diagramfärg',
   'editor.primary_color_helper':
-    'Hex, RGB eller CSS-variabler. Färgerna på staplarna baseras på denna färg.',
+    'Hex, RGB eller CSS-variabler. Fasfärgerna härleds från denna. Skriv {{ för att använda en mall.',
+  'editor.primary_color_template_helper':
+    'Jinja2-mall som returnerar en färg (hex, RGB eller CSS-variabel). Variabeln config är tillgänglig.',
   'editor.chart_configuration_label': 'Diagramkonfiguration',
   'editor.bucket_minutes_label': 'Bucket-storlek (minuter)',
   'editor.bucket_minutes_helper':
