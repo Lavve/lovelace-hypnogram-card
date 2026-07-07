@@ -12,6 +12,7 @@ export default {
   'editor.title_label': 'Titel',
   'editor.show_title_label': 'Visa titel',
   'editor.show_legends_label': 'Visa legender',
+  'editor.show_legend_percentages_label': 'Visa fasprocent',
   'editor.legend_position_label': 'Legendposition',
   'editor.legend_position.left': 'Vänster',
   'editor.legend_position.right': 'Höger',

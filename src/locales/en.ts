@@ -12,6 +12,7 @@ export default {
   'editor.title_label': 'Title',
   'editor.show_title_label': 'Show title',
   'editor.show_legends_label': 'Show legends',
+  'editor.show_legend_percentages_label': 'Show phase percentages',
   'editor.legend_position_label': 'Legend position',
   'editor.legend_position.left': 'Left',
   'editor.legend_position.right': 'Right',

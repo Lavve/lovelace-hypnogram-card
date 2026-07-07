@@ -303,6 +303,7 @@ export class HypnogramCard extends LitElement {
             this.config.show_labels ?? false,
             this.config.legend_position ?? 'left',
             this,
+            this.config.show_legend_percentages ?? false,
           )}
           ${
             this._loading

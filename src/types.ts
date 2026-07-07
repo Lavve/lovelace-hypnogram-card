@@ -9,6 +9,7 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   show_title?: boolean
   show_period_range?: boolean
   show_labels?: boolean
+  show_legend_percentages?: boolean
   legend_position?: LegendPosition
   primary_color?: string
   bucket_minutes?: number

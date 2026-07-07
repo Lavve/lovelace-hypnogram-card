@@ -29,6 +29,7 @@ export class HypnogramCardEditor extends LitElement {
       show_title: config.show_title ?? true,
       show_period_range: config.show_period_range ?? true,
       show_labels: config.show_labels ?? false,
+      show_legend_percentages: config.show_legend_percentages ?? false,
       legend_position: config.legend_position ?? 'left',
       primary_color: config.primary_color ?? DEFAULT_PRIMARY_COLOR,
       bucket_minutes: clampBucketMinutes(config.bucket_minutes),
@@ -77,6 +78,12 @@ export class HypnogramCardEditor extends LitElement {
           {
             name: 'show_labels',
             default: false,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_legend_percentages',
+            default: false,
+            disabled: !this._config.show_labels,
             selector: { boolean: {} },
           },
           {
@@ -179,6 +186,8 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.show_period_range_label', this.hass)
       if (schema.name === 'show_labels')
         return localize('editor.show_legends_label', this.hass)
+      if (schema.name === 'show_legend_percentages')
+        return localize('editor.show_legend_percentages_label', this.hass)
       if (schema.name === 'legend_position')
         return localize('editor.legend_position_label', this.hass)
       if (schema.name === 'display_options')

@@ -1,5 +1,5 @@
 import { CHART_CONFIG } from '@/const'
-import type { ProcessedSleepHistory, SleepSegment } from '@/types'
+import type { ProcessedSleepHistory, SleepPhase, SleepSegment } from '@/types'
 
 export function buildSleepSegments(
   history: ProcessedSleepHistory,
@@ -107,4 +107,34 @@ export function bucketSleepSegments(
   }
 
   return mergeAdjacentSegments(buckets)
+}
+
+export function calculatePhasePercentages(
+  segments: SleepSegment[],
+): Record<SleepPhase, number> | undefined {
+  const durations: Record<SleepPhase, number> = {
+    deep_sleep: 0,
+    light_sleep: 0,
+    rem: 0,
+    awake: 0,
+  }
+
+  let totalMs = 0
+  for (const segment of segments) {
+    const duration = Math.max(0, segment.endMs - segment.startMs)
+    if (!(segment.state in durations)) continue
+    durations[segment.state as SleepPhase] += duration
+    totalMs += duration
+  }
+
+  if (totalMs === 0) {
+    return undefined
+  }
+
+  return {
+    deep_sleep: Math.round((durations.deep_sleep / totalMs) * 100),
+    light_sleep: Math.round((durations.light_sleep / totalMs) * 100),
+    rem: Math.round((durations.rem / totalMs) * 100),
+    awake: Math.round((durations.awake / totalMs) * 100),
+  }
 }

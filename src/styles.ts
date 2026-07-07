@@ -98,6 +98,9 @@ export const cardStyles = css`
     right: 0;
     text-align: right;
   }
+  .chart-container.legend-with-percentages .legends {
+    width: 6.5rem;
+  }
   .legend {
     position: absolute;
     left: 2px;
@@ -115,6 +118,9 @@ export const cardStyles = css`
   }
   .legend.deep_sleep {
     top: 75%;
+  }
+  .legend-percent {
+    opacity: 0.85;
   }
   .error {
     color: var(--error-color);

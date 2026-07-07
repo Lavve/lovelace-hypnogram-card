@@ -20,7 +20,7 @@ If you use another integration that reports sleep phases differently, you can re
 
 - Hypnogram chart with deep sleep, light sleep, REM, and awake phases
 - Optional title and sleep period time range (respects your HA 12h/24h setting)
-- Optional phase legend, positioned left or right
+- Optional phase legend with optional percentages, positioned left or right
 - Chart color based on a single primary color — phase shades are derived automatically (static value or Jinja2 template)
 - Bucket size (1–30 minutes) to smooth short phase changes
 - Tap, hold, and double-tap actions (e.g. open more-info)
@@ -127,8 +127,9 @@ state_mapping:
 | `title`             | string            | `Today`                   | Card title (shown when `show_title` is enabled)                                   |
 | `show_title`        | boolean           | `true`                    | Show or hide the title                                                            |
 | `show_period_range` | boolean           | `true`                    | Show sleep start/end time in the header                                           |
-| `show_labels`       | boolean           | `false`                   | Show phase legend beside the chart                                                |
-| `legend_position`   | `left` \| `right` | `left`                    | Legend placement (only when labels are shown)                                     |
+| `show_labels`             | boolean           | `false`                   | Show phase legend beside the chart                                                |
+| `show_legend_percentages` | boolean           | `false`                   | Show each phase as a percentage in the legend (requires `show_labels`)            |
+| `legend_position`         | `left` \| `right` | `left`                    | Legend placement (only when labels are shown)                                     |
 | `primary_color`     | string            | `var(--primary-color)`    | Base chart color (hex, rgb, CSS variable, or Jinja2 template). Phase colors are derived from this. |
 | `bucket_minutes`    | number            | `30`                      | Group phase changes into time buckets (1–30 minutes) for a smoother chart         |
 | `tap_action`        | action            | `more-info`               | Action on tap                                                                     |
