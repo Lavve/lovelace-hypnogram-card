@@ -111,7 +111,7 @@ export function bucketSleepSegments(
 
 export function calculatePhasePercentages(
   segments: SleepSegment[],
-): Record<SleepPhase, number> {
+): Record<SleepPhase, number> | undefined {
   const durations: Record<SleepPhase, number> = {
     deep_sleep: 0,
     light_sleep: 0,
@@ -128,7 +128,7 @@ export function calculatePhasePercentages(
   }
 
   if (totalMs === 0) {
-    return { deep_sleep: 0, light_sleep: 0, rem: 0, awake: 0 }
+    return undefined
   }
 
   return {

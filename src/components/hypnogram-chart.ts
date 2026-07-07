@@ -74,7 +74,7 @@ export function renderHypnogramChart(
 
   return html`
     <div
-      class="chart-container${showLegends ? ` legend-${legendPosition}` : ''}${showLegendPercentages ? ' legend-with-percentages' : ''}"
+      class="chart-container${showLegends ? ` legend-${legendPosition}` : ''}${phasePercentages ? ' legend-with-percentages' : ''}"
       style=${styleMap({
         position: 'relative',
         width: '100%',
