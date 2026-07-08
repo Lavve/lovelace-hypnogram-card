@@ -25,7 +25,7 @@ import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
 import { logCardBanner } from '@/utils/debug'
 import { bucketSleepSegments, buildSleepSegments } from '@/utils/segments'
 import { isJinjaTemplate, subscribeRenderTemplate } from '@/utils/template'
-import { formatPeriodRange } from '@/utils/time'
+import { formatPeriodRange, formatTotalDuration } from '@/utils/time'
 
 declare global {
   interface Window {
@@ -261,11 +261,16 @@ export class HypnogramCard extends LitElement {
 
     const showTitle = this.config.show_title !== false
     const showPeriod = this.config.show_period_range !== false
+    const showTotalTime = showTitle && this.config.show_total_time !== false
     const title = this.config.title || localize('card.title', this.hass)
     const periodRange = formatPeriodRange(
       this._periodStartMs,
       this._periodEndMs,
       this.hass.locale,
+    )
+    const totalTime = formatTotalDuration(
+      this._periodStartMs,
+      this._periodEndMs,
     )
 
     const interactive =
@@ -284,12 +289,17 @@ export class HypnogramCard extends LitElement {
         tabindex=${interactive ? '0' : '-1'}
       >
         ${
-          showTitle || showPeriod
+          showTitle || showPeriod || showTotalTime
             ? html`
               <div class="header-row">
                 <div class="header${showTitle ? '' : ' is-hidden'}">${title}</div>
-                <div class="period-range${showPeriod ? '' : ' is-hidden'}">
-                  ${periodRange}
+                <div class="header-meta">
+                  <div class="total-time${showTotalTime ? '' : ' is-hidden'}">
+                    ${totalTime}
+                  </div>
+                  <div class="period-range${showPeriod ? '' : ' is-hidden'}">
+                    ${periodRange}
+                  </div>
                 </div>
               </div>
             `

@@ -63,7 +63,17 @@ export const cardStyles = css`
     flex: 1;
     min-width: 0;
   }
-  .period-range {
+  .header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 2px 12px;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .period-range,
+  .total-time {
     font-size: var(--ha-font-size-s);
     font-weight: 400;
     color: var(--secondary-text-color, #9a9a9a);
@@ -71,7 +81,8 @@ export const cardStyles = css`
     flex-shrink: 0;
   }
   .header.is-hidden,
-  .period-range.is-hidden {
+  .period-range.is-hidden,
+  .total-time.is-hidden {
     visibility: hidden;
   }
   .chart-area {
@@ -82,7 +93,9 @@ export const cardStyles = css`
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 4.75rem;
+    width: max-content;
+    min-width: 4.75rem;
+    max-width: 45%;
     box-sizing: border-box;
     font-size: var(--ha-font-size-s);
     line-height: 1.2;
@@ -99,13 +112,19 @@ export const cardStyles = css`
     text-align: right;
   }
   .chart-container.legend-with-percentages .legends {
-    width: 6.5rem;
+    min-width: 6.5rem;
   }
   .legend {
     position: absolute;
-    left: 2px;
-    right: 2px;
     white-space: nowrap;
+  }
+  .chart-container.legend-left .legend {
+    left: 0;
+    right: auto;
+  }
+  .chart-container.legend-right .legend {
+    right: 0;
+    left: auto;
   }
   .legend.awake {
     top: 0;
@@ -148,6 +167,8 @@ export const chartStyles = css`
   .plot {
     position: absolute;
     inset: 0;
+    overflow: hidden;
+    border-radius: 8px;
   }
   .bar {
     box-sizing: border-box;

@@ -18,6 +18,7 @@ export default {
   'editor.legend_position.right': 'Höger',
   'editor.display_options_label': 'Visningsalternativ',
   'editor.show_period_range_label': 'Visa tidsintervall',
+  'editor.show_total_time_label': 'Visa total tid',
   'editor.entity_label': 'Sömndata Entitet (Krav)',
   'editor.primary_color_label': 'Diagramfärg',
   'editor.primary_color_helper':

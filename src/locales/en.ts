@@ -18,6 +18,7 @@ export default {
   'editor.legend_position.right': 'Right',
   'editor.display_options_label': 'Display options',
   'editor.show_period_range_label': 'Show time range',
+  'editor.show_total_time_label': 'Show total time',
   'editor.entity_label': 'Sleep Data Entity (Required)',
   'editor.primary_color_label': 'Chart color',
   'editor.primary_color_helper':

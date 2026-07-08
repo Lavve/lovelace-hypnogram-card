@@ -28,6 +28,7 @@ export class HypnogramCardEditor extends LitElement {
       ...config,
       show_title: config.show_title ?? true,
       show_period_range: config.show_period_range ?? true,
+      show_total_time: config.show_total_time ?? true,
       show_labels: config.show_labels ?? false,
       show_legend_percentages: config.show_legend_percentages ?? false,
       legend_position: config.legend_position ?? 'left',
@@ -73,6 +74,12 @@ export class HypnogramCardEditor extends LitElement {
           {
             name: 'show_period_range',
             default: true,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_total_time',
+            default: true,
+            disabled: !this._config.show_title,
             selector: { boolean: {} },
           },
           {
@@ -184,6 +191,8 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.show_title_label', this.hass)
       if (schema.name === 'show_period_range')
         return localize('editor.show_period_range_label', this.hass)
+      if (schema.name === 'show_total_time')
+        return localize('editor.show_total_time_label', this.hass)
       if (schema.name === 'show_labels')
         return localize('editor.show_legends_label', this.hass)
       if (schema.name === 'show_legend_percentages')
