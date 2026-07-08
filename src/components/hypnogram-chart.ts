@@ -81,7 +81,7 @@ export function renderHypnogramChart(
         height: `${dims.height}px`,
         minHeight: `${dims.height}px`,
         borderRadius: '8px',
-        overflow: 'hidden',
+        overflow: 'visible',
       })}
     >
       ${

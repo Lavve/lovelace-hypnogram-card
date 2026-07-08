@@ -19,7 +19,7 @@ If you use another integration that reports sleep phases differently, you can re
 ## Features
 
 - Hypnogram chart with deep sleep, light sleep, REM, and awake phases
-- Optional title and sleep period time range (respects your HA 12h/24h setting)
+- Optional title, total sleep duration (h:mm), and period time range (respects your HA 12h/24h setting)
 - Optional phase legend with optional percentages, positioned left or right
 - Chart color based on a single primary color — phase shades are derived automatically (static value or Jinja2 template)
 - Bucket size (1–30 minutes) to smooth short phase changes
@@ -102,6 +102,7 @@ entity: sensor.sleep_as_android_cson
 title: Today
 show_title: true
 show_period_range: true
+show_total_time: true
 show_labels: true
 legend_position: left
 primary_color: #3366aa
@@ -127,6 +128,7 @@ state_mapping:
 | `title`             | string            | `Today`                   | Card title (shown when `show_title` is enabled)                                   |
 | `show_title`        | boolean           | `true`                    | Show or hide the title                                                            |
 | `show_period_range` | boolean           | `true`                    | Show sleep start/end time in the header                                           |
+| `show_total_time`   | boolean           | `true`                    | Show total sleep duration as h:mm in the header (requires `show_title`)           |
 | `show_labels`             | boolean           | `false`                   | Show phase legend beside the chart                                                |
 | `show_legend_percentages` | boolean           | `false`                   | Show each phase as a percentage in the legend (requires `show_labels`)            |
 | `legend_position`         | `left` \| `right` | `left`                    | Legend placement (only when labels are shown)                                     |
