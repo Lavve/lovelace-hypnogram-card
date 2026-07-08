@@ -79,7 +79,6 @@ export class HypnogramCardEditor extends LitElement {
           {
             name: 'show_total_time',
             default: true,
-            disabled: !this._config.show_title,
             selector: { boolean: {} },
           },
           {

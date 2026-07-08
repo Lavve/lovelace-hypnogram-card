@@ -1,9 +1,12 @@
 import type { HomeAssistant } from 'custom-card-helpers'
 import en from '@/locales/en'
+import nb from '@/locales/nb'
 import sv from '@/locales/sv'
 
 const languages: Record<string, Record<string, string>> = {
   en,
+  nb,
+  no: nb,
   sv,
 }
 

@@ -173,10 +173,11 @@ If your integration uses different state strings, configure **State mapping** in
 
 The card follows your Home Assistant profile language. Strings fall back to English when a translation is missing.
 
-| Language | Code | Status    |
-| -------- | ---- | --------- |
-| English  | `en` | Default   |
-| Swedish  | `sv` | Supported |
+| Language            | Code   | Status    |
+| ------------------- | ------ | --------- |
+| English             | `en`   | Default   |
+| Norwegian (Bokmål)  | `nb`   | Supported |
+| Swedish             | `sv`   | Supported |
 
 Time formatting (12h/24h) uses Home Assistant's locale settings automatically.
 
