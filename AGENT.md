@@ -38,16 +38,17 @@ Graphs should look similar to what is in the `/images/inspo.png`
 hypnogram-card/
 ├── src/
 │   ├── locales/
-│   │   ├── en.json               # English localization
-│   │   └── sv.json               # Swedish localization
+│   │   ├── en.ts                 # English localization
+│   │   ├── nb.ts                 # Norwegian (Bokmål) localization
+│   │   ├── sv.ts                 # Swedish localization
+│   │   └── localize.ts           # i18n localization dictionary (supports 'en', 'nb', 'no', 'sv', etc.)
 │   ├── services/
 │   │   └── history.ts            # HA WebSocket API interactions & data transforms
 │   ├── hypnogram-card.ts         # Main Lovelace card UI element (React-like controller)
 │   ├── hypnogram-card-editor.ts  # GUI configuration panel using schema-driven <ha-form>
 │   ├── types.ts                  # Shared TypeScript interfaces (YAML config shape, etc.)
 │   ├── styles.ts                 # Extracted Lit CSS styles for card and editor components
-│   ├── const.ts                  # Hardcoded constants and default mappings
-│   └── localize.ts               # i18n localization dictionary (supports 'en', 'sv', etc.)
+│   └── const.ts                  # Hardcoded constants and default mappings
 ├── biome.json                    # Strict code style and formatting configurations (v2.5.2 schema)
 ├── rollup.config.js              # Build asset bundler config (ES modules layout)
 ├── tsconfig.json                 # TypeScript compiler specifications (target: es2022, moduleResolution: bundler)
