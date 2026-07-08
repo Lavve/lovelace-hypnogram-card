@@ -65,9 +65,12 @@ export const cardStyles = css`
   }
   .header-meta {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
-    gap: 12px;
-    flex-shrink: 0;
+    justify-content: flex-end;
+    gap: 2px 12px;
+    flex-shrink: 1;
+    min-width: 0;
   }
   .period-range,
   .total-time {
