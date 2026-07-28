@@ -9,6 +9,7 @@ import {
 import { localize } from '@/locales/localize'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
+import { normalizeHypnogramConfig, resolveLegendFormat } from '@/utils/config'
 import { isJinjaTemplate } from '@/utils/template'
 
 const STATE_MAPPING_PHASES = [
@@ -30,7 +31,9 @@ export class HypnogramCardEditor extends LitElement {
       show_period_range: config.show_period_range ?? true,
       show_total_time: config.show_total_time ?? true,
       show_labels: config.show_labels ?? false,
-      show_legend_percentages: config.show_legend_percentages ?? false,
+      legend_format: resolveLegendFormat(config),
+      show_sleep_efficiency: config.show_sleep_efficiency ?? false,
+      show_sleep_cycles: config.show_sleep_cycles ?? false,
       legend_position: config.legend_position ?? 'left',
       primary_color: config.primary_color ?? DEFAULT_PRIMARY_COLOR,
       bucket_minutes: clampBucketMinutes(config.bucket_minutes),
@@ -87,10 +90,32 @@ export class HypnogramCardEditor extends LitElement {
             selector: { boolean: {} },
           },
           {
-            name: 'show_legend_percentages',
-            default: false,
+            name: 'legend_format',
+            default: 'none',
             disabled: !this._config.show_labels,
-            selector: { boolean: {} },
+            selector: {
+              select: {
+                mode: 'dropdown',
+                options: [
+                  {
+                    value: 'none',
+                    label: localize('editor.legend_format.none', this.hass),
+                  },
+                  {
+                    value: 'percent',
+                    label: localize('editor.legend_format.percent', this.hass),
+                  },
+                  {
+                    value: 'duration',
+                    label: localize('editor.legend_format.duration', this.hass),
+                  },
+                  {
+                    value: 'both',
+                    label: localize('editor.legend_format.both', this.hass),
+                  },
+                ],
+              },
+            },
           },
           {
             name: 'legend_position',
@@ -111,6 +136,16 @@ export class HypnogramCardEditor extends LitElement {
                 ],
               },
             },
+          },
+          {
+            name: 'show_sleep_efficiency',
+            default: false,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_sleep_cycles',
+            default: false,
+            selector: { boolean: {} },
           },
         ],
       },
@@ -194,8 +229,12 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.show_total_time_label', this.hass)
       if (schema.name === 'show_labels')
         return localize('editor.show_legends_label', this.hass)
-      if (schema.name === 'show_legend_percentages')
-        return localize('editor.show_legend_percentages_label', this.hass)
+      if (schema.name === 'legend_format')
+        return localize('editor.legend_format_label', this.hass)
+      if (schema.name === 'show_sleep_efficiency')
+        return localize('editor.show_sleep_efficiency_label', this.hass)
+      if (schema.name === 'show_sleep_cycles')
+        return localize('editor.show_sleep_cycles_label', this.hass)
       if (schema.name === 'legend_position')
         return localize('editor.legend_position_label', this.hass)
       if (schema.name === 'display_options')
@@ -237,6 +276,12 @@ export class HypnogramCardEditor extends LitElement {
       }
       if (schema.name === 'bucket_minutes')
         return localize('editor.bucket_minutes_helper', this.hass)
+      if (schema.name === 'legend_format')
+        return localize('editor.legend_format_helper', this.hass)
+      if (schema.name === 'show_sleep_efficiency')
+        return localize('editor.show_sleep_efficiency_helper', this.hass)
+      if (schema.name === 'show_sleep_cycles')
+        return localize('editor.show_sleep_cycles_helper', this.hass)
       if (schema.name === 'state_mapping')
         return localize('editor.state_mapping_helper', this.hass)
       return undefined
@@ -255,7 +300,9 @@ export class HypnogramCardEditor extends LitElement {
   }
 
   private _valueChanged(ev: CustomEvent): void {
-    const config = ev.detail.value as HypnogramCardConfig
+    const config = normalizeHypnogramConfig(
+      ev.detail.value as HypnogramCardConfig,
+    )
     this._config = config
 
     const event = new CustomEvent('config-changed', {

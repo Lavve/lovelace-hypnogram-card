@@ -22,8 +22,14 @@ import { fetchSleepHistory, processSleepHistory } from '@/services/history'
 import { cardStyles, chartStyles } from '@/styles'
 import type { HypnogramCardConfig, SleepSegment } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
+import { resolveLegendFormat } from '@/utils/config'
 import { logCardBanner } from '@/utils/debug'
-import { bucketSleepSegments, buildSleepSegments } from '@/utils/segments'
+import {
+  bucketSleepSegments,
+  buildSleepSegments,
+  calculateSleepEfficiency,
+  estimateSleepCycles,
+} from '@/utils/segments'
 import { isJinjaTemplate, subscribeRenderTemplate } from '@/utils/template'
 import { formatPeriodRange, formatTotalDuration } from '@/utils/time'
 
@@ -262,6 +268,8 @@ export class HypnogramCard extends LitElement {
     const showTitle = this.config.show_title !== false
     const showPeriod = this.config.show_period_range !== false
     const showTotalTime = showTitle && this.config.show_total_time !== false
+    const showSleepEfficiency = this.config.show_sleep_efficiency === true
+    const showSleepCycles = this.config.show_sleep_cycles === true
     const title = this.config.title || localize('card.title', this.hass)
     const periodRange = formatPeriodRange(
       this._periodStartMs,
@@ -272,6 +280,13 @@ export class HypnogramCard extends LitElement {
       this._periodStartMs,
       this._periodEndMs,
     )
+    const sleepEfficiency = showSleepEfficiency
+      ? calculateSleepEfficiency(this._rawSegments)
+      : undefined
+    const sleepCycles = showSleepCycles
+      ? estimateSleepCycles(this._rawSegments)
+      : undefined
+    const legendFormat = resolveLegendFormat(this.config)
 
     const interactive =
       hasAction(this.config.tap_action) ||
@@ -289,7 +304,11 @@ export class HypnogramCard extends LitElement {
         tabindex=${interactive ? '0' : '-1'}
       >
         ${
-          showTitle || showPeriod || showTotalTime
+          showTitle ||
+          showPeriod ||
+          showTotalTime ||
+          showSleepEfficiency ||
+          showSleepCycles
             ? html`
               <div class="header-row">
                 <div class="header${showTitle ? '' : ' is-hidden'}">${title}</div>
@@ -297,6 +316,28 @@ export class HypnogramCard extends LitElement {
                   <div class="total-time${showTotalTime ? '' : ' is-hidden'}">
                     ${totalTime}
                   </div>
+                  ${
+                    showSleepCycles && sleepCycles !== undefined
+                      ? html`
+                        <div class="sleep-cycles">
+                          ${localize('card.sleep_cycles', this.hass, {
+                            count: sleepCycles,
+                          })}
+                        </div>
+                      `
+                      : ''
+                  }
+                  ${
+                    showSleepEfficiency && sleepEfficiency !== undefined
+                      ? html`
+                        <div class="sleep-efficiency">
+                          ${localize('card.sleep_efficiency', this.hass, {
+                            value: sleepEfficiency,
+                          })}
+                        </div>
+                      `
+                      : ''
+                  }
                   <div class="period-range${showPeriod ? '' : ' is-hidden'}">
                     ${periodRange}
                   </div>
@@ -313,7 +354,7 @@ export class HypnogramCard extends LitElement {
             this.config.show_labels ?? false,
             this.config.legend_position ?? 'left',
             this,
-            this.config.show_legend_percentages ?? false,
+            legendFormat,
           )}
           ${
             this._loading

@@ -2,6 +2,8 @@ import type { ActionConfig, LovelaceCardConfig } from 'custom-card-helpers'
 
 export type LegendPosition = 'left' | 'right'
 
+export type LegendFormat = 'none' | 'percent' | 'duration' | 'both'
+
 export interface HypnogramCardConfig extends LovelaceCardConfig {
   type: string
   entity: string
@@ -10,7 +12,11 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   show_period_range?: boolean
   show_total_time?: boolean
   show_labels?: boolean
+  /** @deprecated Use legend_format instead */
   show_legend_percentages?: boolean
+  legend_format?: LegendFormat
+  show_sleep_efficiency?: boolean
+  show_sleep_cycles?: boolean
   legend_position?: LegendPosition
   primary_color?: string
   bucket_minutes?: number
