@@ -73,7 +73,9 @@ export const cardStyles = css`
     min-width: 0;
   }
   .period-range,
-  .total-time {
+  .total-time,
+  .sleep-efficiency,
+  .sleep-cycles {
     font-size: var(--ha-font-size-s);
     font-weight: 400;
     color: var(--secondary-text-color, #9a9a9a);
@@ -111,8 +113,14 @@ export const cardStyles = css`
     right: 0;
     text-align: right;
   }
-  .chart-container.legend-with-percentages .legends {
+  .chart-container.legend-with-values .legends {
     min-width: 6.5rem;
+  }
+  .chart-container.legend-format-both .legends {
+    min-width: 9rem;
+  }
+  .chart-container.legend-format-duration .legends {
+    min-width: 7.5rem;
   }
   .legend {
     position: absolute;
@@ -138,7 +146,7 @@ export const cardStyles = css`
   .legend.deep_sleep {
     top: 75%;
   }
-  .legend-percent {
+  .legend-value {
     opacity: 0.85;
   }
   .error {

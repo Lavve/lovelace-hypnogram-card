@@ -109,7 +109,7 @@ export function bucketSleepSegments(
   return mergeAdjacentSegments(buckets)
 }
 
-export function calculatePhasePercentages(
+export function calculatePhaseDurations(
   segments: SleepSegment[],
 ): Record<SleepPhase, number> | undefined {
   const durations: Record<SleepPhase, number> = {
@@ -131,10 +131,59 @@ export function calculatePhasePercentages(
     return undefined
   }
 
+  return durations
+}
+
+export function calculatePhasePercentages(
+  segments: SleepSegment[],
+): Record<SleepPhase, number> | undefined {
+  const durations = calculatePhaseDurations(segments)
+  if (!durations) return undefined
+
+  const totalMs =
+    durations.deep_sleep +
+    durations.light_sleep +
+    durations.rem +
+    durations.awake
+
   return {
     deep_sleep: Math.round((durations.deep_sleep / totalMs) * 100),
     light_sleep: Math.round((durations.light_sleep / totalMs) * 100),
     rem: Math.round((durations.rem / totalMs) * 100),
     awake: Math.round((durations.awake / totalMs) * 100),
   }
+}
+
+export function calculateSleepEfficiency(
+  segments: SleepSegment[],
+): number | undefined {
+  const durations = calculatePhaseDurations(segments)
+  if (!durations) return undefined
+
+  const totalMs =
+    durations.deep_sleep +
+    durations.light_sleep +
+    durations.rem +
+    durations.awake
+  if (totalMs === 0) return undefined
+
+  const sleepMs = totalMs - durations.awake
+  return Math.round((sleepMs / totalMs) * 100)
+}
+
+export function estimateSleepCycles(segments: SleepSegment[]): number {
+  if (segments.length === 0) return 0
+
+  const merged = mergeAdjacentSegments(segments)
+  let cycles = 0
+
+  for (let i = 1; i < merged.length; i++) {
+    const previous = merged[i - 1]
+    const current = merged[i]
+    if (current.state === 'deep_sleep' && previous.state !== 'deep_sleep') {
+      cycles++
+    }
+  }
+
+  return cycles
 }

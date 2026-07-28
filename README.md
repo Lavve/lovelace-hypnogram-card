@@ -20,7 +20,8 @@ If you use another integration that reports sleep phases differently, you can re
 
 - Hypnogram chart with deep sleep, light sleep, REM, and awake phases
 - Optional title, total sleep duration (h:mm), and period time range (respects your HA 12h/24h setting)
-- Optional phase legend with optional percentages, positioned left or right
+- Optional phase legend with duration, percentage, or both beside each label, positioned left or right
+- Optional sleep efficiency (%) and estimated sleep cycle count in the header
 - Chart color based on a single primary color — phase shades are derived automatically (static value or Jinja2 template)
 - Bucket size (1–30 minutes) to smooth short phase changes
 - Tap, hold, and double-tap actions (e.g. open more-info)
@@ -104,7 +105,10 @@ show_title: true
 show_period_range: true
 show_total_time: true
 show_labels: true
+legend_format: both
 legend_position: left
+show_sleep_efficiency: true
+show_sleep_cycles: true
 primary_color: #3366aa
 bucket_minutes: 30
 tap_action:
@@ -129,15 +133,23 @@ state_mapping:
 | `show_title`        | boolean           | `true`                    | Show or hide the title                                                            |
 | `show_period_range` | boolean           | `true`                    | Show sleep start/end time in the header                                           |
 | `show_total_time`   | boolean           | `true`                    | Show total sleep duration as h:mm in the header (requires `show_title`)           |
-| `show_labels`             | boolean           | `false`                   | Show phase legend beside the chart                                                |
-| `show_legend_percentages` | boolean           | `false`                   | Show each phase as a percentage in the legend (requires `show_labels`)            |
-| `legend_position`         | `left` \| `right` | `left`                    | Legend placement (only when labels are shown)                                     |
+| `show_labels`           | boolean                              | `false`                   | Show phase legend beside the chart                                                |
+| `legend_format`         | `none` \| `percent` \| `duration` \| `both` | `none`               | Values shown beside legend labels (requires `show_labels`)                        |
+| `legend_position`       | `left` \| `right`                    | `left`                    | Legend placement (only when labels are shown)                                     |
+| `show_sleep_efficiency` | boolean                              | `false`                   | Show sleep efficiency (%) in the header                                           |
+| `show_sleep_cycles`     | boolean                              | `false`                   | Show estimated sleep cycle count in the header                                    |
 | `primary_color`     | string            | `var(--primary-color)`    | Base chart color (hex, rgb, CSS variable, or Jinja2 template). Phase colors are derived from this. |
 | `bucket_minutes`    | number            | `30`                      | Group phase changes into time buckets (1–30 minutes) for a smoother chart         |
 | `tap_action`        | action            | `more-info`               | Action on tap                                                                     |
 | `hold_action`       | action            | `none`                    | Action on hold                                                                    |
 | `double_tap_action` | action            | `none`                    | Action on double tap                                                              |
 | `state_mapping`     | object            | Sleep as Android defaults | Maps entity states to internal phase names                                        |
+
+> **Note:** `show_legend_percentages` is deprecated. Use `legend_format: percent` instead. Existing configs are migrated automatically in the visual editor.
+
+**Sleep efficiency** is calculated as actual sleep time (all phases except awake) divided by total time in bed.
+
+**Sleep cycles** are estimated by counting how many times the chart dips into deep sleep during the night.
 
 ### Dynamic chart color (template)
 

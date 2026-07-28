@@ -6,6 +6,7 @@ import { localize } from '@/locales/localize'
 import { buildChartPalette } from '@/styles'
 import type {
   ChartPalette,
+  LegendFormat,
   LegendPosition,
   SleepPhase,
   SleepSegment,
@@ -17,7 +18,11 @@ import {
   getChartDimensions,
   getLayoutSegmentRect,
 } from '@/utils/chart'
-import { calculatePhasePercentages } from '@/utils/segments'
+import { formatLegendValue } from '@/utils/legend'
+import {
+  calculatePhaseDurations,
+  calculatePhasePercentages,
+} from '@/utils/segments'
 
 function getPhaseColor(palette: ChartPalette, state: string): string {
   return (
@@ -33,13 +38,17 @@ export function renderHypnogramChart(
   showLegends?: boolean,
   legendPosition: LegendPosition = 'left',
   context?: HTMLElement,
-  showLegendPercentages = false,
+  legendFormat: LegendFormat = 'none',
 ): TemplateResult {
   const palette = buildChartPalette(primaryColor, context)
   const dims = getChartDimensions(400, CHART_CONFIG.height)
   const layout = buildCompressedLayout(segments)
   const hasData = layout.layoutEndMs > 0 && layout.bars.length > 0
-  const phasePercentages = showLegendPercentages
+  const showLegendValues = legendFormat !== 'none'
+  const phaseDurations = showLegendValues
+    ? calculatePhaseDurations(segments)
+    : undefined
+  const phasePercentages = showLegendValues
     ? calculatePhasePercentages(segments)
     : undefined
 
@@ -74,7 +83,7 @@ export function renderHypnogramChart(
 
   return html`
     <div
-      class="chart-container${showLegends ? ` legend-${legendPosition}` : ''}${phasePercentages ? ' legend-with-percentages' : ''}"
+      class="chart-container${showLegends ? ` legend-${legendPosition}` : ''}${showLegendValues ? ` legend-with-values legend-format-${legendFormat}` : ''}"
       style=${styleMap({
         position: 'relative',
         width: '100%',
@@ -92,8 +101,14 @@ export function renderHypnogramChart(
               (label) => html`
             <div class="legend ${label.key}">
               ${label.label}${
-                phasePercentages
-                  ? html` <span class="legend-percent">${phasePercentages[label.key]}%</span>`
+                showLegendValues && phaseDurations && phasePercentages
+                  ? html` <span class="legend-value">${formatLegendValue(
+                      label.key,
+                      legendFormat,
+                      phaseDurations,
+                      phasePercentages,
+                      hass,
+                    )}</span>`
                   : ''
               }
             </div>`,

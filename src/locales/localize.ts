@@ -10,12 +10,27 @@ const languages: Record<string, Record<string, string>> = {
   sv,
 }
 
-export function localize(string: string, hass?: HomeAssistant): string {
+export function localize(
+  string: string,
+  hass?: HomeAssistant,
+  replacements?: Record<string, string | number>,
+): string {
   const lang = hass?.locale?.language || hass?.language || 'en'
 
+  let result: string
   try {
-    return languages[lang]?.[string] || languages.en[string] || string
+    result = languages[lang]?.[string] || languages.en[string] || string
   } catch {
-    return languages.en[string] || string
+    result = languages.en[string] || string
   }
+
+  if (!replacements) {
+    return result
+  }
+
+  for (const [key, value] of Object.entries(replacements)) {
+    result = result.replace(`{${key}}`, String(value))
+  }
+
+  return result
 }
