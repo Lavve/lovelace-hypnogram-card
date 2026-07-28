@@ -57,4 +57,9 @@ export default {
   'editor.state_mapping.light_sleep': 'Light sleep entity state',
   'editor.state_mapping.rem': 'REM entity state',
   'editor.state_mapping.awake': 'Awake entity state',
+  'editor.tracking_mapping_label': 'Tracking mapping',
+  'editor.tracking_mapping_helper':
+    'Entity state values that mark the start and end of a sleep session. Defaults match Sleep as Android.',
+  'editor.tracking_mapping.started': 'Sleep session started entity state',
+  'editor.tracking_mapping.stopped': 'Sleep session stopped entity state',
 }

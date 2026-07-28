@@ -53,6 +53,9 @@ export const cardStyles = css`
     gap: 12px;
     margin-bottom: 12px;
   }
+  .header-row-meta-only {
+    justify-content: flex-end;
+  }
   .header {
     font-weight: 600;
     font-size: var(--ha-font-size-l);
@@ -81,11 +84,6 @@ export const cardStyles = css`
     color: var(--secondary-text-color, #9a9a9a);
     white-space: nowrap;
     flex-shrink: 0;
-  }
-  .header.is-hidden,
-  .period-range.is-hidden,
-  .total-time.is-hidden {
-    visibility: hidden;
   }
   .chart-area {
     position: relative;
