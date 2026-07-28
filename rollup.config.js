@@ -14,6 +14,7 @@ export default {
     format: 'es',
     sourcemap: false,
   },
+  external: ['custom-card-helpers'],
   plugins: [
     alias({
       entries: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
