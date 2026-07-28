@@ -1,8 +1,9 @@
 import type { HomeAssistant } from 'custom-card-helpers'
-import { PHASE_LEVELS, SLEEP_AS_ANDROID } from '@/const'
+import { PHASE_LEVELS } from '@/const'
 import type {
   HistoryState,
   HypnogramCardStateMapping,
+  HypnogramCardTrackingMapping,
   ProcessedSleepHistory,
   SleepDataPoint,
 } from '@/types'
@@ -42,13 +43,16 @@ function isPhaseState(state: string): boolean {
   return state in PHASE_LEVELS
 }
 
-function findSleepWindow(sortedPoints: { state: string; timestamp: Date }[]): {
+function findSleepWindow(
+  sortedPoints: { state: string; timestamp: Date }[],
+  trackingMapping: HypnogramCardTrackingMapping,
+): {
   startIndex: number
   stopIndex: number
 } {
   let startIndex = -1
   for (let i = sortedPoints.length - 1; i >= 0; i--) {
-    if (sortedPoints[i].state === SLEEP_AS_ANDROID.tracking.started) {
+    if (sortedPoints[i].state === trackingMapping.started) {
       startIndex = i
       break
     }
@@ -63,7 +67,7 @@ function findSleepWindow(sortedPoints: { state: string; timestamp: Date }[]): {
     const lastStopBeforePhases = sortedPoints
       .slice(0, firstPhaseIndex)
       .map((p) => p.state)
-      .lastIndexOf(SLEEP_AS_ANDROID.tracking.stopped)
+      .lastIndexOf(trackingMapping.stopped)
 
     if (lastStopBeforePhases !== -1) {
       return {
@@ -76,7 +80,7 @@ function findSleepWindow(sortedPoints: { state: string; timestamp: Date }[]): {
   }
 
   let stopIndex = sortedPoints.findIndex(
-    (p, i) => i > startIndex && p.state === SLEEP_AS_ANDROID.tracking.stopped,
+    (p, i) => i > startIndex && p.state === trackingMapping.stopped,
   )
   if (stopIndex === -1) stopIndex = sortedPoints.length - 1
 
@@ -117,6 +121,7 @@ export async function fetchSleepHistory(
 export function processSleepHistory(
   rawHistory: HistoryState[],
   stateMapping: HypnogramCardStateMapping,
+  trackingMapping: HypnogramCardTrackingMapping,
 ): ProcessedSleepHistory {
   const empty: ProcessedSleepHistory = {
     points: [],
@@ -137,7 +142,10 @@ export function processSleepHistory(
 
   if (sortedPoints.length === 0) return empty
 
-  const { startIndex, stopIndex } = findSleepWindow(sortedPoints)
+  const { startIndex, stopIndex } = findSleepWindow(
+    sortedPoints,
+    trackingMapping,
+  )
   let sleepPeriod = sortedPoints.slice(startIndex, stopIndex + 1)
 
   let points: SleepDataPoint[] = sleepPeriod

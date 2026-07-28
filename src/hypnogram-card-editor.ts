@@ -2,9 +2,11 @@ import type { HomeAssistant } from 'custom-card-helpers'
 import { html, LitElement, type TemplateResult } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import {
+  CARD_TYPE_EDITOR,
   CHART_CONFIG,
   clampBucketMinutes,
   DEFAULT_STATE_MAPPING,
+  DEFAULT_TRACKING_MAPPING,
 } from '@/const'
 import { localize } from '@/locales/localize'
 import type { HaFormSchemaField, HypnogramCardConfig } from '@/types'
@@ -19,7 +21,9 @@ const STATE_MAPPING_PHASES = [
   'awake',
 ] as const
 
-@customElement('hypnogram-card-editor')
+const TRACKING_MAPPING_KEYS = ['started', 'stopped'] as const
+
+@customElement(CARD_TYPE_EDITOR)
 export class HypnogramCardEditor extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant
   @state() private _config!: HypnogramCardConfig
@@ -43,6 +47,10 @@ export class HypnogramCardEditor extends LitElement {
       state_mapping: {
         ...DEFAULT_STATE_MAPPING,
         ...config.state_mapping,
+      },
+      tracking_mapping: {
+        ...DEFAULT_TRACKING_MAPPING,
+        ...config.tracking_mapping,
       },
     }
   }
@@ -75,18 +83,28 @@ export class HypnogramCardEditor extends LitElement {
             selector: { boolean: {} },
           },
           {
-            name: 'show_period_range',
-            default: true,
-            selector: { boolean: {} },
-          },
-          {
             name: 'show_total_time',
             default: true,
             selector: { boolean: {} },
           },
           {
-            name: 'show_labels',
+            name: 'show_sleep_cycles',
             default: false,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_sleep_efficiency',
+            default: false,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_period_range',
+            default: true,
+            selector: { boolean: {} },
+          },
+          {
+            name: 'show_labels',
+            default: true,
             selector: { boolean: {} },
           },
           {
@@ -137,16 +155,6 @@ export class HypnogramCardEditor extends LitElement {
               },
             },
           },
-          {
-            name: 'show_sleep_efficiency',
-            default: false,
-            selector: { boolean: {} },
-          },
-          {
-            name: 'show_sleep_cycles',
-            default: false,
-            selector: { boolean: {} },
-          },
         ],
       },
       {
@@ -157,6 +165,17 @@ export class HypnogramCardEditor extends LitElement {
           name: phase,
           required: true,
           default: DEFAULT_STATE_MAPPING[phase],
+          selector: { text: {} },
+        })),
+      },
+      {
+        type: 'expandable',
+        name: 'tracking_mapping',
+        icon: 'mdi:clock-start',
+        schema: TRACKING_MAPPING_KEYS.map((key) => ({
+          name: key,
+          required: true,
+          default: DEFAULT_TRACKING_MAPPING[key],
           selector: { text: {} },
         })),
       },
@@ -257,6 +276,8 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.interaction_label', this.hass)
       if (schema.name === 'state_mapping')
         return localize('editor.state_mapping_label', this.hass)
+      if (schema.name === 'tracking_mapping')
+        return localize('editor.tracking_mapping_label', this.hass)
       if (
         schema.name &&
         STATE_MAPPING_PHASES.includes(
@@ -264,6 +285,14 @@ export class HypnogramCardEditor extends LitElement {
         )
       ) {
         return localize(`editor.state_mapping.${schema.name}`, this.hass)
+      }
+      if (
+        schema.name &&
+        TRACKING_MAPPING_KEYS.includes(
+          schema.name as (typeof TRACKING_MAPPING_KEYS)[number],
+        )
+      ) {
+        return localize(`editor.tracking_mapping.${schema.name}`, this.hass)
       }
       return schema.name ?? ''
     }
@@ -284,6 +313,8 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.show_sleep_cycles_helper', this.hass)
       if (schema.name === 'state_mapping')
         return localize('editor.state_mapping_helper', this.hass)
+      if (schema.name === 'tracking_mapping')
+        return localize('editor.tracking_mapping_helper', this.hass)
       return undefined
     }
 

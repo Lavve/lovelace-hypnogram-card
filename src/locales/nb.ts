@@ -57,4 +57,9 @@ export default {
   'editor.state_mapping.light_sleep': 'Lett søvn entitetstilstand',
   'editor.state_mapping.rem': 'REM entitetstilstand',
   'editor.state_mapping.awake': 'Våken entitetstilstand',
+  'editor.tracking_mapping_label': 'Sporingskartlegging',
+  'editor.tracking_mapping_helper':
+    'Entitetstilstander som markerer start og slutt på en søvnøkt. Standardverdier matcher Sleep as Android.',
+  'editor.tracking_mapping.started': 'Søvn startet entitetstilstand',
+  'editor.tracking_mapping.stopped': 'Søvn avsluttet entitetstilstand',
 }

@@ -24,6 +24,7 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   hold_action?: ActionConfig
   double_tap_action?: ActionConfig
   state_mapping?: HypnogramCardStateMapping
+  tracking_mapping?: HypnogramCardTrackingMapping
 }
 
 export interface HaFormSchemaField {
@@ -46,6 +47,11 @@ export interface HypnogramCardStateMapping {
   light_sleep: string
   rem: string
   awake: string
+}
+
+export interface HypnogramCardTrackingMapping {
+  started: string
+  stopped: string
 }
 
 export interface SleepIntegrationPreset {

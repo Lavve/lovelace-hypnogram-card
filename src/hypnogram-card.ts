@@ -12,9 +12,12 @@ import { actionHandler } from '@/action-handler-directive'
 import { renderHypnogramChart } from '@/components/hypnogram-chart'
 import {
   CARD_NAME,
+  CARD_TYPE,
+  CARD_TYPE_EDITOR,
   CARD_VERSION,
   clampBucketMinutes,
   DEFAULT_STATE_MAPPING,
+  DEFAULT_TRACKING_MAPPING,
 } from '@/const'
 import '@/hypnogram-card-editor'
 import { localize } from '@/locales/localize'
@@ -44,7 +47,7 @@ declare global {
   }
 }
 
-@customElement('hypnogram-card')
+@customElement(CARD_TYPE)
 export class HypnogramCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant
   @state() private config!: HypnogramCardConfig
@@ -63,12 +66,12 @@ export class HypnogramCard extends LitElement {
   private _unsubPrimaryColor?: Promise<() => void>
 
   public static getConfigElement(): HTMLElement {
-    return document.createElement('hypnogram-card-editor')
+    return document.createElement(CARD_TYPE_EDITOR)
   }
 
   public static getStubConfig(): Record<string, unknown> {
     return {
-      type: 'custom:hypnogram-card',
+      type: `custom:${CARD_TYPE}`,
       title: '',
       entity: '',
       grid_options: {
@@ -85,6 +88,10 @@ export class HypnogramCard extends LitElement {
     const next: HypnogramCardConfig = {
       ...config,
       state_mapping: config.state_mapping || DEFAULT_STATE_MAPPING,
+      tracking_mapping: {
+        ...DEFAULT_TRACKING_MAPPING,
+        ...config.tracking_mapping,
+      },
     }
     if (this.config && deepEqual(this.config, next)) {
       return
@@ -222,6 +229,7 @@ export class HypnogramCard extends LitElement {
       const history = processSleepHistory(
         historyData,
         this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
+        this.config.tracking_mapping ?? DEFAULT_TRACKING_MAPPING,
       )
 
       this._periodStartMs = history.periodStart.getTime()
@@ -310,12 +318,14 @@ export class HypnogramCard extends LitElement {
           showSleepEfficiency ||
           showSleepCycles
             ? html`
-              <div class="header-row">
-                <div class="header${showTitle ? '' : ' is-hidden'}">${title}</div>
+              <div class="header-row${showTitle ? '' : ' header-row-meta-only'}">
+                ${showTitle ? html`<div class="header">${title}</div>` : ''}
                 <div class="header-meta">
-                  <div class="total-time${showTotalTime ? '' : ' is-hidden'}">
-                    ${totalTime}
-                  </div>
+                  ${
+                    showTotalTime
+                      ? html`<div class="total-time">${totalTime}</div>`
+                      : ''
+                  }
                   ${
                     showSleepCycles && sleepCycles !== undefined
                       ? html`
@@ -338,9 +348,11 @@ export class HypnogramCard extends LitElement {
                       `
                       : ''
                   }
-                  <div class="period-range${showPeriod ? '' : ' is-hidden'}">
-                    ${periodRange}
-                  </div>
+                  ${
+                    showPeriod
+                      ? html`<div class="period-range">${periodRange}</div>`
+                      : ''
+                  }
                 </div>
               </div>
             `
@@ -377,7 +389,7 @@ logCardBanner(CARD_NAME, CARD_VERSION)
 
 window.customCards = window.customCards ?? []
 window.customCards.push({
-  type: 'hypnogram-card',
+  type: CARD_TYPE,
   name: CARD_NAME,
   description: 'Sleep hypnogram chart for Home Assistant',
   preview: true,

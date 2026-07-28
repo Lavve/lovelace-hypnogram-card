@@ -1,6 +1,6 @@
 # Hypnogram Card
 
-A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that visualizes your latest sleep session as a hypnogram — a stacked chart of sleep phases over time.
+A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that visualizes your latest sleep session as a hypnogram; a stacked chart of sleep phases over time.
 
 ![Hypnogram card on a dashboard](./images/screenshot-dashboard.png)
 
@@ -14,7 +14,7 @@ This card is aimed at Home Assistant users who track sleep and want a visual sum
 
 **Works out of the box** with [Sleep as Android](https://sleep.urbandroid.org/) via its Home Assistant integration. The default state mapping matches Sleep as Android entity states (`deep_sleep`, `light_sleep`, `rem`, `awake`).
 
-If you use another integration that reports sleep phases differently, you can remap entity states in the card editor under **State mapping**.
+If you use another integration that reports sleep phases differently, you can remap entity states in the card editor under **State mapping** and **Tracking mapping**.
 
 ## Features
 
@@ -22,7 +22,7 @@ If you use another integration that reports sleep phases differently, you can re
 - Optional title, total sleep duration (h:mm), and period time range (respects your HA 12h/24h setting)
 - Optional phase legend with duration, percentage, or both beside each label, positioned left or right
 - Optional sleep efficiency (%) and estimated sleep cycle count in the header
-- Chart color based on a single primary color — phase shades are derived automatically (static value or Jinja2 template)
+- Chart color based on a single primary color. Phase shades are derived automatically (static value or Jinja2 template)
 - Bucket size (1–30 minutes) to smooth short phase changes
 - Tap, hold, and double-tap actions (e.g. open more-info)
 - Visual card editor with grouped settings
@@ -30,29 +30,17 @@ If you use another integration that reports sleep phases differently, you can re
 
 ## Screenshots
 
-<table>
-  <thead>
-    <tr>
-      <th>Dashboard</th>
-      <th>Card editor</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><img src="./images/screenshot-dashboard.png" alt="Hypnogram card on a dashboard"></td>
-      <td rowspan="4" style="vertical-align: top;"><img src="./images/screenshot-editor.png" alt="Card configuration in the visual editor"></td>
-    </tr>
-    <tr>
-      <td><img src="./images/screenshot-dashboard-4.png" alt="Hypnogram card on a dashboard"></td>
-    </tr>
-    <tr>
-      <td><img src="./images/screenshot-dashboard-3.png" alt="Hypnogram card on a dashboard"></td>
-    </tr>
-    <tr>
-      <td><img src="./images/screenshot-dashboard-2.png" alt="Hypnogram card on a dashboard"></td>
-    </tr>
-  </tbody>
-</table>
+| Card editor                                                                  |
+| ---------------------------------------------------------------------------- |
+| ![Card configuration in the visual editor](./images/screenshot-editor-1.png) |
+| ![Card configuration in the visual editor](./images/screenshot-editor-2.png) |
+| ![Card configuration in the visual editor](./images/screenshot-editor-3.png) |
+
+| Dashboard examples                                                    |
+| --------------------------------------------------------------------- |
+| ![Hypnogram card on a dashboard](./images/screenshot-dashboard.png)   |
+| ![Hypnogram card on a dashboard](./images/screenshot-dashboard-2.png) |
+| ![Hypnogram card on a dashboard](./images/screenshot-dashboard-3.png) |
 
 ## Requirements
 
@@ -71,7 +59,7 @@ If you use another integration that reports sleep phases differently, you can re
 
 ### Manual
 
-1. Download `hypnogram-card.js` from the [latest release](https://github.com/Lavve/lovelace-hypnogram-card/releases) (or build it locally — see [Development](#development)).
+1. Download `hypnogram-card.js` from the [latest release](https://github.com/Lavve/lovelace-hypnogram-card/releases) (or build it locally, see [Development](#development)).
 
 2. Copy the file to your Home Assistant `config/www/` folder.
 
@@ -122,28 +110,32 @@ state_mapping:
   light_sleep: light_sleep
   rem: rem
   awake: awake
+tracking_mapping:
+  started: sleep_tracking_started
+  stopped: sleep_tracking_stopped
 ```
 
 ### Configuration options
 
-| Option              | Type              | Default                   | Description                                                                       |
-| ------------------- | ----------------- | ------------------------- | --------------------------------------------------------------------------------- |
-| `entity`            | string            | *required*                | Sensor entity with sleep phase history                                            |
-| `title`             | string            | `Today`                   | Card title (shown when `show_title` is enabled)                                   |
-| `show_title`        | boolean           | `true`                    | Show or hide the title                                                            |
-| `show_period_range` | boolean           | `true`                    | Show sleep start/end time in the header                                           |
-| `show_total_time`   | boolean           | `true`                    | Show total sleep duration as h:mm in the header (requires `show_title`)           |
-| `show_labels`           | boolean                              | `false`                   | Show phase legend beside the chart                                                |
-| `legend_format`         | `none` \| `percent` \| `duration` \| `both` | `none`               | Values shown beside legend labels (requires `show_labels`)                        |
-| `legend_position`       | `left` \| `right`                    | `left`                    | Legend placement (only when labels are shown)                                     |
-| `show_sleep_efficiency` | boolean                              | `false`                   | Show sleep efficiency (%) in the header                                           |
-| `show_sleep_cycles`     | boolean                              | `false`                   | Show estimated sleep cycle count in the header                                    |
-| `primary_color`     | string            | `var(--primary-color)`    | Base chart color (hex, rgb, CSS variable, or Jinja2 template). Phase colors are derived from this. |
-| `bucket_minutes`    | number            | `30`                      | Group phase changes into time buckets (1–30 minutes) for a smoother chart         |
-| `tap_action`        | action            | `more-info`               | Action on tap                                                                     |
-| `hold_action`       | action            | `none`                    | Action on hold                                                                    |
-| `double_tap_action` | action            | `none`                    | Action on double tap                                                              |
-| `state_mapping`     | object            | Sleep as Android defaults | Maps entity states to internal phase names                                        |
+| Option                  | Type                                        | Default                   | Description                                                                                                    |
+| ----------------------- | ------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `entity`                | string                                      | *required*                | Sensor entity with sleep phase history                                                                         |
+| `title`                 | string                                      | `Today`                   | Card title (shown when `show_title` is enabled)                                                                |
+| `show_title`            | boolean                                     | `true`                    | Show or hide the title                                                                                         |
+| `show_period_range`     | boolean                                     | `true`                    | Show sleep start/end time in the header                                                                        |
+| `show_total_time`       | boolean                                     | `true`                    | Show total sleep duration as h:mm in the header (requires `show_title`)                                        |
+| `show_labels`           | boolean                                     | `false`                   | Show phase legend beside the chart                                                                             |
+| `legend_format`         | `none` \| `percent` \| `duration` \| `both` | `none`                    | Values shown beside legend labels (requires `show_labels`)                                                     |
+| `legend_position`       | `left` \| `right`                           | `left`                    | Legend placement (only when labels are shown)                                                                  |
+| `show_sleep_efficiency` | boolean                                     | `false`                   | Show sleep efficiency (%) in the header                                                                        |
+| `show_sleep_cycles`     | boolean                                     | `false`                   | Show estimated sleep cycle count in the header                                                                 |
+| `primary_color`         | string                                      | `var(--primary-color)`    | Base chart color (hex, rgb, color name, CSS variable, or Jinja2 template). Phase colors are derived from this. |
+| `bucket_minutes`        | number                                      | `30`                      | Group phase changes into time buckets (1–30 minutes) for a smoother chart                                      |
+| `tap_action`            | action                                      | `more-info`               | Action on tap                                                                                                  |
+| `hold_action`           | action                                      | `none`                    | Action on hold                                                                                                 |
+| `double_tap_action`     | action                                      | `none`                    | Action on double tap                                                                                           |
+| `state_mapping`         | object                                      | Sleep as Android defaults | Maps entity states to internal phase names                                                                     |
+| `tracking_mapping`      | object                                      | Sleep as Android defaults | Entity states that mark the start and end of a sleep session                                                   |
 
 > **Note:** `show_legend_percentages` is deprecated. Use `legend_format: percent` instead. Existing configs are migrated automatically in the visual editor.
 
@@ -157,7 +149,7 @@ state_mapping:
 
 The card exposes the full card config as `config` in templates, so you can reference `config.entity` and any other Home Assistant template helpers (`states()`, `is_state()`, etc.).
 
-Example: color the chart by total sleep duration from a helper sensor — red if under 6 hours, orange if under 7 hours, otherwise green:
+Example: color the chart by total sleep duration from a helper sensor, red if under 6 hours, orange if under 7 hours, otherwise green:
 
 ```yaml
 type: custom:hypnogram-card
@@ -165,31 +157,42 @@ entity: sensor.sleep_phases
 primary_color: >-
   {% set hours = states('sensor.sleep_duration') | float(0) %}
   {% if hours < 6 %}
-    red
+    var(--error-color)
   {% elif hours < 7 %}
-    orange
+    rgb(255 165 0)
   {% else %}
-    green
+    #008000
   {% endif %}
 ```
 
 Replace `sensor.sleep_duration` with your own sensor that reports sleep length in hours (e.g. from Sleep as Android, a template sensor, or an integration attribute).
 
-### State mapping
+### State and tracking mapping
 
-The card expects history entries whose states can be mapped to four phases: `deep_sleep`, `light_sleep`, `rem`, and `awake`. It also recognizes tracking events (`sleep_tracking_started` / `sleep_tracking_stopped`) to find the latest sleep window.
+The card expects history entries whose states can be mapped to four phases: `deep_sleep`, `light_sleep`, `rem`, and `awake`. It also uses tracking events to find the latest sleep window. By default `sleep_tracking_started` and `sleep_tracking_stopped` (Sleep as Android).
 
-If your integration uses different state strings, configure **State mapping** in the editor so each phase points to the correct entity state value.
+If your integration uses different state strings, configure **State mapping** and **Tracking mapping** in the editor:
+
+```yaml
+state_mapping:
+  deep_sleep: deep
+  light_sleep: light
+  rem: rem
+  awake: awake
+tracking_mapping:
+  started: tracking_on
+  stopped: tracking_off
+```
 
 ## Language support
 
 The card follows your Home Assistant profile language. Strings fall back to English when a translation is missing.
 
-| Language            | Code   | Status    |
-| ------------------- | ------ | --------- |
-| English             | `en`   | Default   |
-| Norwegian (Bokmål)  | `nb`   | Supported |
-| Swedish             | `sv`   | Supported |
+| Language           | Code | Status    |
+| ------------------ | ---- | --------- |
+| English            | `en` | Default   |
+| Norwegian (Bokmål) | `nb` | Supported |
+| Swedish            | `sv` | Supported |
 
 Time formatting (12h/24h) uses Home Assistant's locale settings automatically.
 
@@ -202,7 +205,7 @@ Contributions are welcome. To add a language, open a pull request on [GitHub](ht
 3. Register the new locale in `src/locales/localize.ts`:
    - import your file
    - add it to the `languages` object with the same code
-4. Run `pnpm lint` and `pnpm build` to verify everything passes.
+4. Run `pnpm format` and `pnpm build` to verify everything passes.
 5. Submit the PR with the language name in the title (e.g. "Add German translation").
 
 If your language has regional variants in Home Assistant (e.g. `pt-BR`), use the same code HA reports in `hass.locale.language`.
