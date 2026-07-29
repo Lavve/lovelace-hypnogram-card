@@ -2,8 +2,6 @@
 
 This document serves as the persistent memory and architectural blueprint for the `hypnogram-card` Home Assistant custom Lovelace card project. Refer to this file to maintain codebase consistency, code style, and structural alignment.
 
-Graphs should look similar to what is in the `/images/inspo.png`
-
 ---
 
 ## Technical Stack & Infrastructure
@@ -44,6 +42,8 @@ hypnogram-card/
 │   │   └── localize.ts           # i18n localization dictionary (supports 'en', 'nb', 'no', 'sv', etc.)
 │   ├── services/
 │   │   └── history.ts            # HA WebSocket API interactions & data transforms
+│   ├── utils/
+│   │   └── *.ts                  # Helpers and uitilities
 │   ├── hypnogram-card.ts         # Main Lovelace card UI element (React-like controller)
 │   ├── hypnogram-card-editor.ts  # GUI configuration panel using schema-driven <ha-form>
 │   ├── types.ts                  # Shared TypeScript interfaces (YAML config shape, etc.)
