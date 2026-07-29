@@ -47,6 +47,44 @@ If you use another integration that reports sleep phases differently, you can re
 - Home Assistant with Lovelace dashboards
 - A sensor entity that records sleep phase changes in its history (typically updated by a sleep tracking integration)
 
+### Official Sleep as Android (event-based) note
+
+The official [Sleep as Android integration](https://www.home-assistant.io/integrations/sleep_as_android/) exposes sleep phases as `event.*` entities (not `sensor.*`), while this card requires a `sensor.*` entity with reliable history.
+
+To use the card with the official integration, create a small helper `template` sensor that merges:
+
+1. `event.sleep_as_android_sleep_phase` (deep_sleep/light_sleep/rem/awake, etc.)
+2. `event.sleep_as_android_sleep_tracking` (started/stopped)
+
+into a single `sensor.*` with state changes.
+
+Quick steps (UI helper):
+
+1. Settings -> Devices & services -> Helpers -> Create helper -> Template -> Sensor
+2. Name it (e.g. `Sleep as Android Hypnogram`)
+3. In `State`, paste the template below (keep the `event.*` entity_ids as needed):
+
+```yaml
+{% set phase = state_attr('event.sleep_as_android_sleep_phase', 'event_type') %}
+{% set tracking = state_attr('event.sleep_as_android_sleep_tracking', 'event_type') %}
+{% if tracking == 'started' %}
+  sleep_tracking_started
+{% elif tracking == 'stopped' %}
+  sleep_tracking_stopped
+{% elif phase in ['deep_sleep', 'light_sleep', 'rem', 'awake'] %}
+  {{ phase }}
+{% else %}
+  unknown
+{% endif %}
+```
+
+Then set the card `entity` to the helper sensor (e.g. `sensor.sleep_as_android_hypnogram`).
+
+Notes:
+
+- Only `deep_sleep`, `light_sleep`, `rem`, and `awake` are emitted as phases; everything else (including `not_awake`) becomes `unknown` and is ignored by the card.
+- If your event entity IDs differ, update them in the template.
+
 ## Installation
 
 ### HACS (recommended)
@@ -64,7 +102,7 @@ If you use another integration that reports sleep phases differently, you can re
 2. Copy the file to your Home Assistant `config/www/` folder.
 
 3. Add a Lovelace resource:
-
+   
    ```yaml
    url: /local/hypnogram-card.js
    type: module
@@ -198,17 +236,7 @@ Time formatting (12h/24h) uses Home Assistant's locale settings automatically.
 
 ### Adding a new language
 
-Contributions are welcome. To add a language, open a pull request on [GitHub](https://github.com/Lavve/lovelace-hypnogram-card):
-
-1. Copy `src/locales/en.ts` to `src/locales/<code>.ts` using the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (e.g. `de.ts` for German).
-2. Translate every string value. Keep the keys unchanged.
-3. Register the new locale in `src/locales/localize.ts`:
-   - import your file
-   - add it to the `languages` object with the same code
-4. Run `pnpm format` and `pnpm build` to verify everything passes.
-5. Submit the PR with the language name in the title (e.g. "Add German translation").
-
-If your language has regional variants in Home Assistant (e.g. `pt-BR`), use the same code HA reports in `hass.locale.language`.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md#translations) for the latest translation instructions.
 
 ## Development
 
