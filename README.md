@@ -54,9 +54,13 @@ The official [Sleep as Android integration](https://www.home-assistant.io/integr
 To use the card with the official integration, create a small helper `template` sensor that merges:
 
 1. `event.sleep_as_android_sleep_phase` (deep_sleep/light_sleep/rem/awake, etc.)
-2. `event.sleep_as_android_sleep_tracking` (started/stopped)
+2. `event.sleep_as_android_sleep_tracking` (started/stopped/resumed)
 
 into a single `sensor.*` with state changes.
+
+Home Assistant `event.*` entities keep the **last** `event_type` until that same entity fires again. After tracking starts, `event.sleep_as_android_sleep_tracking` stays `started` all night. A template that checks `tracking == 'started'` first will therefore never record sleep phases.
+
+Use `last_updated` on both events and take whichever fired most recently.
 
 Quick steps (UI helper):
 
@@ -67,12 +71,18 @@ Quick steps (UI helper):
 ```yaml
 {% set phase = state_attr('event.sleep_as_android_sleep_phase', 'event_type') %}
 {% set tracking = state_attr('event.sleep_as_android_sleep_tracking', 'event_type') %}
-{% if tracking == 'started' %}
-  sleep_tracking_started
-{% elif tracking == 'stopped' %}
+
+{% set tracking_time = states.event.sleep_as_android_sleep_tracking.last_updated if states.event.sleep_as_android_sleep_tracking is not none else as_datetime(0) %}
+{% set phase_time = states.event.sleep_as_android_sleep_phase.last_updated if states.event.sleep_as_android_sleep_phase is not none else as_datetime(0) %}
+
+{% set latest_event = tracking if tracking_time > phase_time else phase %}
+
+{% if latest_event == 'stopped' %}
   sleep_tracking_stopped
-{% elif phase in ['deep_sleep', 'light_sleep', 'rem', 'awake'] %}
-  {{ phase }}
+{% elif latest_event in ['started', 'resumed'] %}
+  sleep_tracking_started
+{% elif latest_event in ['deep_sleep', 'light_sleep', 'rem', 'awake'] %}
+  {{ latest_event }}
 {% else %}
   unknown
 {% endif %}
@@ -82,8 +92,10 @@ Then set the card `entity` to the helper sensor (e.g. `sensor.sleep_as_android_h
 
 Notes:
 
-- Only `deep_sleep`, `light_sleep`, `rem`, and `awake` are emitted as phases; everything else (including `not_awake`) becomes `unknown` and is ignored by the card.
+- Only `deep_sleep`, `light_sleep`, `rem`, and `awake` are emitted as phases; everything else (including `not_awake` and `paused`) becomes `unknown` and is ignored by the card.
+- `resumed` is mapped to `sleep_tracking_started` so a pause/resume still marks the session start.
 - If your event entity IDs differ, update them in the template.
+- If you already created a helper with the older template, update its state template. Existing history will still be start/stop only; the card needs a new sleep session after the change.
 
 ## Installation
 
@@ -125,24 +137,7 @@ Notes:
 
 ```yaml
 type: custom:hypnogram-card
-entity: sensor.sleep_as_android_cson
-title: Today
-show_title: true
-show_period_range: true
-show_total_time: true
-show_labels: true
-legend_format: both
-legend_position: left
-show_sleep_efficiency: true
-show_sleep_cycles: true
-primary_color: #3366aa
-bucket_minutes: 30
-tap_action:
-  action: more-info
-hold_action:
-  action: none
-double_tap_action:
-  action: none
+entity: sensor.sleep_as_android_hypnogram
 state_mapping:
   deep_sleep: deep_sleep
   light_sleep: light_sleep
@@ -151,6 +146,23 @@ state_mapping:
 tracking_mapping:
   started: sleep_tracking_started
   stopped: sleep_tracking_stopped
+primary_color: '#3366aa'
+tap_action:
+  action: more-info
+hold_action:
+  action: none
+double_tap_action:
+  action: none
+bucket_minutes: 30
+show_title: true
+show_period_range: true
+show_labels: true
+show_total_time: true
+legend_position: left
+legend_format: both
+show_sleep_efficiency: true
+show_sleep_cycles: true
+title: Today
 ```
 
 ### Configuration options
