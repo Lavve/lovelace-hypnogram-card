@@ -46,6 +46,9 @@ export default {
   'editor.bucket_minutes_label': 'Bucket-storlek (minuter)',
   'editor.bucket_minutes_helper':
     'Grupperar korta fasändringar i tidsintervall. Högre värden jämnar ut diagrammet. Kan sättas till 1-30 minuter.',
+  'editor.stages_attribute_label': 'Attribut för sömnfaser',
+  'editor.stages_attribute_helper':
+    'Valfritt. Entitetsattribut med en lista med stage, start och end, för data som saknar tillståndshistorik. Lämna tomt för att använda tillståndshistorik.',
   'editor.tap_action_label': 'Tryckåtgärd',
   'editor.hold_action_label': 'Håll åtgärd',
   'editor.double_tap_action_label': 'Dubbeltrycksåtgärd',

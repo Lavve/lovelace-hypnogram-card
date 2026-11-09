@@ -45,7 +45,7 @@ If you use another integration that reports sleep phases differently, you can re
 ## Requirements
 
 - Home Assistant with Lovelace dashboards
-- A sensor entity that records sleep phase changes in its history (typically updated by a sleep tracking integration)
+- A sensor entity that records sleep phase changes in its history (typically updated by a sleep tracking integration), or one that holds the night in an attribute (see [Stages from an attribute](#stages-from-an-attribute))
 
 ### Official Sleep as Android (event-based) note
 
@@ -181,6 +181,7 @@ title: Today
 | `show_sleep_cycles`     | boolean                                     | `false`                   | Show estimated sleep cycle count in the header                                                                 |
 | `primary_color`         | string                                      | `var(--primary-color)`    | Base chart color (hex, rgb, color name, CSS variable, or Jinja2 template). Phase colors are derived from this. |
 | `bucket_minutes`        | number                                      | `30`                      | Group phase changes into time buckets (1–30 minutes) for a smoother chart                                      |
+| `stages_attribute`      | string                                      | not set                   | Entity attribute with a list of stages to draw instead of state history                                        |
 | `tap_action`            | action                                      | `more-info`               | Action on tap                                                                                                  |
 | `hold_action`           | action                                      | `none`                    | Action on hold                                                                                                 |
 | `double_tap_action`     | action                                      | `none`                    | Action on double tap                                                                                           |
@@ -233,6 +234,32 @@ tracking_mapping:
   started: tracking_on
   stopped: tracking_off
 ```
+
+### Stages from an attribute
+
+Some sensors receive a night's data after the fact, for example from a phone or a cloud service. Those nights have no state history to read. If such a sensor keeps the night in an attribute, point `stages_attribute` at it and the card draws from that list instead:
+
+```yaml
+type: custom:hypnogram-card
+entity: sensor.last_night
+stages_attribute: stages
+state_mapping:
+  deep_sleep: deep
+  light_sleep: light
+  rem: rem
+  awake: awake
+```
+
+The attribute is a list of items with ISO 8601 times, drawn as one sleep session:
+
+```json
+[
+  { "stage": "light", "start": "2026-11-08T23:10:00+01:00", "end": "2026-11-08T23:50:00+01:00" },
+  { "stage": "deep", "start": "2026-11-08T23:50:00+01:00", "end": "2026-11-09T00:40:00+01:00" }
+]
+```
+
+`state_mapping` and `bucket_minutes` work as usual, and `tracking_mapping` is not needed. Items that are incomplete or have an invalid time are skipped. If no usable items remain, the card shows its normal empty state. Without this option the card reads state history as before.
 
 ## Language support
 

@@ -46,6 +46,9 @@ export default {
   'editor.bucket_minutes_label': 'Bucket size (minutes)',
   'editor.bucket_minutes_helper':
     'Groups short phase changes into time buckets. Higher values smooth the chart. Can be set to 1-30 minutes.',
+  'editor.stages_attribute_label': 'Stages attribute',
+  'editor.stages_attribute_helper':
+    'Optional. Entity attribute holding a list of items with stage, start and end, for data that has no state history. Leave empty to use state history.',
   'editor.tap_action_label': 'Tap action',
   'editor.hold_action_label': 'Hold action',
   'editor.double_tap_action_label': 'Double tap action',

@@ -118,6 +118,35 @@ export async function fetchSleepHistory(
   }
 }
 
+export function stagesToHistory(
+  stages: unknown,
+  trackingMapping: HypnogramCardTrackingMapping,
+): HistoryState[] {
+  if (!Array.isArray(stages)) return []
+
+  const history: HistoryState[] = []
+  let lastEndMs = 0
+
+  for (const item of stages) {
+    const { stage, start, end } = item ?? {}
+    if (!stage || typeof stage !== 'string') continue
+    if (typeof start !== 'string' || typeof end !== 'string') continue
+
+    const startMs = Date.parse(start)
+    const endMs = Date.parse(end)
+    if (!(endMs > startMs)) continue
+
+    history.push({ s: stage, lc: startMs / 1000 })
+    lastEndMs = Math.max(lastEndMs, endMs)
+  }
+
+  if (history.length > 0) {
+    history.push({ s: trackingMapping.stopped, lc: lastEndMs / 1000 })
+  }
+
+  return history
+}
+
 export function processSleepHistory(
   rawHistory: HistoryState[],
   stateMapping: HypnogramCardStateMapping,

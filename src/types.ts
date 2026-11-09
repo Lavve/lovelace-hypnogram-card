@@ -20,6 +20,7 @@ export interface HypnogramCardConfig extends LovelaceCardConfig {
   legend_position?: LegendPosition
   primary_color?: string
   bucket_minutes?: number
+  stages_attribute?: string
   tap_action?: ActionConfig
   hold_action?: ActionConfig
   double_tap_action?: ActionConfig
