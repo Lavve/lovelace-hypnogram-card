@@ -269,6 +269,8 @@ The attribute is a list of items with ISO 8601 times, drawn as one sleep session
 
 `state_mapping` and `bucket_minutes` work as usual, and `tracking_mapping` is not needed. Items that are incomplete or have an invalid time are skipped. If no usable items remain, the card shows its normal empty state. Without this option the card reads state history as before.
 
+One known source is the [Life Dashboard](https://github.com/owen282000/life-dashboard-ha) integration, which exposes a `stages` attribute on sensors such as `sensor.*_last_sleep_asleep`.
+
 ## Language support
 
 The card follows your Home Assistant profile language. Strings fall back to English when a translation is missing.

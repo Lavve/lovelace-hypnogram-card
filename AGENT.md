@@ -36,9 +36,10 @@ This document serves as the persistent memory and architectural blueprint for th
 hypnogram-card/
 ├── src/
 │   ├── locales/
-│   │   ├── en.ts                 # English localization
-│   │   ├── nb.ts                 # Norwegian (Bokmål) localization
-│   │   ├── sv.ts                 # Swedish localization
+│   │   ├── languages/
+│   │   │   ├── en.ts             # English localization
+│   │   │   ├── nb.ts             # Norwegian (Bokmål) localization
+│   │   │   └── sv.ts             # Swedish localization
 │   │   └── localize.ts           # i18n localization dictionary (supports 'en', 'nb', 'no', 'sv', etc.)
 │   ├── services/
 │   │   └── history.ts            # HA WebSocket API interactions & data transforms
@@ -49,7 +50,7 @@ hypnogram-card/
 │   ├── types.ts                  # Shared TypeScript interfaces (YAML config shape, etc.)
 │   ├── styles.ts                 # Extracted Lit CSS styles for card and editor components
 │   └── const.ts                  # Hardcoded constants and default mappings
-├── biome.json                    # Strict code style and formatting configurations (v2.5.2 schema)
+├── biome.json                    # Strict code style and formatting configurations (v2.6.6 schema)
 ├── rollup.config.js              # Build asset bundler config (ES modules layout)
 ├── tsconfig.json                 # TypeScript compiler specifications (target: es2022, moduleResolution: bundler)
 └── package.json                  # Dependencies configuration ("type": "module" enabled)
