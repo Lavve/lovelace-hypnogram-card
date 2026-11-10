@@ -53,4 +53,3 @@ To add a new language:
 5. Submit the PR with the language name in the title (e.g. "Add German translation").
 
 If your language has regional variants in Home Assistant (e.g. `pt-BR`), use the same code HA reports in `hass.locale.language`.
-

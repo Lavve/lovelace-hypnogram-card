@@ -114,7 +114,7 @@ Notes:
 2. Copy the file to your Home Assistant `config/www/` folder.
 
 3. Add a Lovelace resource:
-   
+
    ```yaml
    url: /local/hypnogram-card.js
    type: module
@@ -146,7 +146,7 @@ state_mapping:
 tracking_mapping:
   started: sleep_tracking_started
   stopped: sleep_tracking_stopped
-primary_color: '#3366aa'
+primary_color: "#3366aa"
 tap_action:
   action: more-info
 hold_action:
@@ -169,7 +169,7 @@ title: Today
 
 | Option                  | Type                                        | Default                   | Description                                                                                                    |
 | ----------------------- | ------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `entity`                | string                                      | *required*                | Sensor entity with sleep phase history                                                                         |
+| `entity`                | string                                      | _required_                | Sensor entity with sleep phase history                                                                         |
 | `title`                 | string                                      | `Today`                   | Card title (shown when `show_title` is enabled)                                                                |
 | `show_title`            | boolean                                     | `true`                    | Show or hide the title                                                                                         |
 | `show_period_range`     | boolean                                     | `true`                    | Show sleep start/end time in the header                                                                        |
@@ -254,8 +254,16 @@ The attribute is a list of items with ISO 8601 times, drawn as one sleep session
 
 ```json
 [
-  { "stage": "light", "start": "2026-11-08T23:10:00+01:00", "end": "2026-11-08T23:50:00+01:00" },
-  { "stage": "deep", "start": "2026-11-08T23:50:00+01:00", "end": "2026-11-09T00:40:00+01:00" }
+  {
+    "stage": "light",
+    "start": "2026-11-08T23:10:00+01:00",
+    "end": "2026-11-08T23:50:00+01:00"
+  },
+  {
+    "stage": "deep",
+    "start": "2026-11-08T23:50:00+01:00",
+    "end": "2026-11-09T00:40:00+01:00"
+  }
 ]
 ```
 

@@ -6,16 +6,16 @@ This document serves as the persistent memory and architectural blueprint for th
 
 ## Technical Stack & Infrastructure
 
-*   **Home assistant version:**
-    *   Core: 2026.7.0 -
-    *   Supervisor: 2026.06.02 -
-    *   Operating system: 18.1 -
-    *   Frontend: 20260624.3
-*   **Framework:** Lit (v3.x) using TypeScript decorators (`@customElement`, `@property`, `@state`).
-*   **Package Manager:** `pnpm` (Strict lockfile, node_linker/hard links setup).
-*   **Code Quality & Formatting:** Biome (v2.x) configured as the exclusive linter and formatter.
-*   **Bundler:** Rollup with `@rollup/plugin-typescript` and `@rollup/plugin-node-resolve`.
-*   **Target Environment:** Home Assistant Frontend (Lovelace Dashboard Plugin).
+-   **Home assistant version:**
+    -   Core: 2026.7.0 -
+    -   Supervisor: 2026.06.02 -
+    -   Operating system: 18.1 -
+    -   Frontend: 20260624.3
+-   **Framework:** Lit (v3.x) using TypeScript decorators (`@customElement`, `@property`, `@state`).
+-   **Package Manager:** `pnpm` (Strict lockfile, node_linker/hard links setup).
+-   **Code Quality & Formatting:** Biome (v2.x) configured as the exclusive linter and formatter.
+-   **Bundler:** Rollup with `@rollup/plugin-typescript` and `@rollup/plugin-node-resolve`.
+-   **Target Environment:** Home Assistant Frontend (Lovelace Dashboard Plugin).
 
 ---
 
@@ -24,9 +24,9 @@ This document serves as the persistent memory and architectural blueprint for th
 1.  **Language:** All source code, variables, functions, types, and logging must be written in **English**.
 2.  **No Comments:** Do not write boilerplate or explanatory comments inside the code files. Code must be self-documenting, clean, and declarative.
 3.  **Formatting Constraints:**
-    *   **Single Quotes Only:** (`quoteStyle: "single"`) for all string literals.
-    *   **No Semicolons:** (`semicolons: "asNeeded"`), eliminate trailing semicolons unless structurally required by JavaScript ASI rules.
-    *   **Indentation:** 2 spaces.
+    -   **Single Quotes Only:** (`quoteStyle: "single"`) for all string literals.
+    -   **No Semicolons:** (`semicolons: "asNeeded"`), eliminate trailing semicolons unless structurally required by JavaScript ASI rules.
+    -   **Indentation:** 2 spaces.
 
 ---
 
