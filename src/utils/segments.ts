@@ -14,7 +14,9 @@ export function buildSleepSegments(
     const point = points[i]
     const nextPoint = points[i + 1]
     const startMs = point.timestamp.getTime()
-    const endMs = nextPoint ? nextPoint.timestamp.getTime() : periodEndMs
+    const nextMs = nextPoint ? nextPoint.timestamp.getTime() : periodEndMs
+    // A point with its own end stops there, so a gap before the next one stays empty.
+    const endMs = point.end ? Math.min(nextMs, point.end.getTime()) : nextMs
 
     if (endMs <= startMs) continue
 
@@ -38,7 +40,10 @@ function mergeAdjacentSegments(segments: SleepSegment[]): SleepSegment[] {
     const previous = merged[merged.length - 1]
     const current = segments[i]
 
-    if (current.state === previous.state) {
+    if (
+      current.state === previous.state &&
+      current.startMs === previous.endMs
+    ) {
       previous.endMs = current.endMs
     } else {
       merged.push({ ...current })

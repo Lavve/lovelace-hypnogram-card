@@ -21,7 +21,7 @@ function reverseStateMapping(
 function normalizeHistoryState(
   entry: HistoryState & { state?: string; last_changed?: string },
   reverseMapping: Record<string, string>,
-): { state: string; timestamp: Date } | null {
+): { state: string; timestamp: Date; end?: Date } | null {
   const rawState = entry.s ?? entry.state
   if (!rawState) return null
 
@@ -36,6 +36,7 @@ function normalizeHistoryState(
   return {
     state: reverseMapping[rawState] ?? rawState,
     timestamp: new Date(seconds * 1000),
+    ...(entry.e !== undefined ? { end: new Date(entry.e * 1000) } : {}),
   }
 }
 
@@ -136,7 +137,7 @@ export function stagesToHistory(
     const endMs = Date.parse(end)
     if (!(endMs > startMs)) continue
 
-    history.push({ s: stage, lc: startMs / 1000 })
+    history.push({ s: stage, lc: startMs / 1000, e: endMs / 1000 })
     lastEndMs = Math.max(lastEndMs, endMs)
   }
 
@@ -165,7 +166,8 @@ export function processSleepHistory(
   const sortedPoints = rawHistory
     .map((entry) => normalizeHistoryState(entry, reverseMapping))
     .filter(
-      (point): point is { state: string; timestamp: Date } => point !== null,
+      (point): point is { state: string; timestamp: Date; end?: Date } =>
+        point !== null,
     )
     .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
@@ -183,6 +185,7 @@ export function processSleepHistory(
       state: point.state,
       level: PHASE_LEVELS[point.state],
       timestamp: point.timestamp,
+      ...(point.end ? { end: point.end } : {}),
     }))
 
   if (points.length === 0) {
@@ -192,6 +195,7 @@ export function processSleepHistory(
         state: point.state,
         level: PHASE_LEVELS[point.state],
         timestamp: point.timestamp,
+        ...(point.end ? { end: point.end } : {}),
       }))
     sleepPeriod = sortedPoints
   }

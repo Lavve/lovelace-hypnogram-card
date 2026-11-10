@@ -69,6 +69,8 @@ export interface HistoryState {
   state?: string
   lu?: number
   lc?: number
+  /** End of the phase in seconds, when the source knows it. */
+  e?: number
   last_changed?: string
 }
 
@@ -76,6 +78,8 @@ export interface SleepDataPoint {
   state: string
   level: number
   timestamp: Date
+  /** Where the phase ends, if earlier than the next point. */
+  end?: Date
 }
 
 export interface SleepSegment {

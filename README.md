@@ -237,7 +237,7 @@ tracking_mapping:
 
 ### Stages from an attribute
 
-Some sensors receive a night's data after the fact, for example from a phone or a cloud service. Those nights have no state history to read. If such a sensor keeps the night in an attribute, point `stages_attribute` at it and the card draws from that list instead:
+Some sensors receive a night's data after the fact, for example from a phone or a cloud service. Those nights have no state history to read. If such a sensor keeps the night in an attribute, point `stages_attribute` at it and the card draws from that list instead. Each item ends at its own `end`, so a gap in the list stays empty:
 
 ```yaml
 type: custom:hypnogram-card
