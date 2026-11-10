@@ -56,9 +56,17 @@ export function buildCompressedLayout(
   const bars: LayoutSegment[] = []
   let compressed = 0
 
+  let previousEndMs: number | undefined
+
   for (const segment of segments) {
     const duration = segment.endMs - segment.startMs
     if (duration <= 0) continue
+
+    // Keep a gap between phases as empty space, at its real width.
+    if (previousEndMs !== undefined && segment.startMs > previousEndMs) {
+      compressed += segment.startMs - previousEndMs
+    }
+    previousEndMs = segment.endMs
 
     bars.push({
       ...segment,

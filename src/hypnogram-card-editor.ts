@@ -204,6 +204,10 @@ export class HypnogramCardEditor extends LitElement {
               },
             },
           },
+          {
+            name: 'stages_attribute',
+            selector: { text: {} },
+          },
         ],
       },
       {
@@ -264,6 +268,8 @@ export class HypnogramCardEditor extends LitElement {
         return localize('editor.primary_color_label', this.hass)
       if (schema.name === 'bucket_minutes')
         return localize('editor.bucket_minutes_label', this.hass)
+      if (schema.name === 'stages_attribute')
+        return localize('editor.stages_attribute_label', this.hass)
       if (schema.name === 'chart_configuration')
         return localize('editor.chart_configuration_label', this.hass)
       if (schema.name === 'tap_action')
@@ -305,6 +311,8 @@ export class HypnogramCardEditor extends LitElement {
       }
       if (schema.name === 'bucket_minutes')
         return localize('editor.bucket_minutes_helper', this.hass)
+      if (schema.name === 'stages_attribute')
+        return localize('editor.stages_attribute_helper', this.hass)
       if (schema.name === 'legend_format')
         return localize('editor.legend_format_helper', this.hass)
       if (schema.name === 'show_sleep_efficiency')

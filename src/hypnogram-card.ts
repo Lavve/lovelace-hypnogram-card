@@ -21,7 +21,11 @@ import {
 } from '@/const'
 import '@/hypnogram-card-editor'
 import { localize } from '@/locales/localize'
-import { fetchSleepHistory, processSleepHistory } from '@/services/history'
+import {
+  fetchSleepHistory,
+  processSleepHistory,
+  stagesToHistory,
+} from '@/services/history'
 import { cardStyles, chartStyles } from '@/styles'
 import type { HypnogramCardConfig, SleepSegment } from '@/types'
 import { DEFAULT_PRIMARY_COLOR } from '@/utils/colors'
@@ -60,6 +64,7 @@ export class HypnogramCard extends LitElement {
   private _lastEntityId?: string
   private _lastState?: string
   private _lastBucketMinutes?: number
+  private _lastStages?: unknown
   private _fetchGeneration = 0
   private _primaryColorTemplate?: string
   private _subscribedPrimaryColorConfig?: HypnogramCardConfig
@@ -120,6 +125,8 @@ export class HypnogramCard extends LitElement {
     const stateChanged = this._lastState !== currentState
     const bucketMinutes = this._getBucketMinutes()
     const bucketChanged = this._lastBucketMinutes !== bucketMinutes
+    const stages = this._getStages()
+    const stagesChanged = this._lastStages !== stages
     const needsInitialFetch = this._lastEntityId === undefined
 
     if (bucketChanged && this._rawSegments.length > 0) {
@@ -127,16 +134,23 @@ export class HypnogramCard extends LitElement {
       this._applyBucketedSegments()
     }
 
-    if (entityChanged || stateChanged || needsInitialFetch) {
+    if (entityChanged || stateChanged || stagesChanged || needsInitialFetch) {
       this._lastEntityId = entityId
       this._lastState = currentState
       this._lastBucketMinutes = bucketMinutes
+      this._lastStages = stages
       void this._updateHistory(entityId)
     }
   }
 
   private _getBucketMinutes(): number {
     return clampBucketMinutes(this.config.bucket_minutes)
+  }
+
+  private _getStages(): unknown {
+    const attribute = this.config.stages_attribute
+    if (!attribute) return undefined
+    return this.hass.states[this.config.entity]?.attributes[attribute]
   }
 
   private _applyBucketedSegments(): void {
@@ -223,13 +237,17 @@ export class HypnogramCard extends LitElement {
     this._loading = true
 
     try {
-      const historyData = await fetchSleepHistory(this.hass, entityId)
+      const trackingMapping =
+        this.config.tracking_mapping ?? DEFAULT_TRACKING_MAPPING
+      const historyData = this.config.stages_attribute
+        ? stagesToHistory(this._getStages(), trackingMapping)
+        : await fetchSleepHistory(this.hass, entityId)
       if (generation !== this._fetchGeneration) return
 
       const history = processSleepHistory(
         historyData,
         this.config.state_mapping ?? DEFAULT_STATE_MAPPING,
-        this.config.tracking_mapping ?? DEFAULT_TRACKING_MAPPING,
+        trackingMapping,
       )
 
       this._periodStartMs = history.periodStart.getTime()

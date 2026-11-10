@@ -46,6 +46,9 @@ export default {
   'editor.bucket_minutes_label': 'Bucket-størrelse (minutter)',
   'editor.bucket_minutes_helper':
     'Grupperer korte faseendringer i tidsintervaller. Høyere verdier jevner ut diagrammet. Kan settes til 1-30 minutter.',
+  'editor.stages_attribute_label': 'Attributt for søvnfaser',
+  'editor.stages_attribute_helper':
+    'Valgfritt. Entitetsattributt med en liste med stage, start og end, for data uten tilstandshistorikk. La stå tomt for å bruke tilstandshistorikk.',
   'editor.tap_action_label': 'Trykk-handling',
   'editor.hold_action_label': 'Hold-handling',
   'editor.double_tap_action_label': 'Dobbelttrykk-handling',

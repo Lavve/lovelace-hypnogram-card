@@ -21,7 +21,7 @@ function reverseStateMapping(
 function normalizeHistoryState(
   entry: HistoryState & { state?: string; last_changed?: string },
   reverseMapping: Record<string, string>,
-): { state: string; timestamp: Date } | null {
+): { state: string; timestamp: Date; end?: Date } | null {
   const rawState = entry.s ?? entry.state
   if (!rawState) return null
 
@@ -36,6 +36,7 @@ function normalizeHistoryState(
   return {
     state: reverseMapping[rawState] ?? rawState,
     timestamp: new Date(seconds * 1000),
+    ...(entry.e !== undefined ? { end: new Date(entry.e * 1000) } : {}),
   }
 }
 
@@ -118,6 +119,35 @@ export async function fetchSleepHistory(
   }
 }
 
+export function stagesToHistory(
+  stages: unknown,
+  trackingMapping: HypnogramCardTrackingMapping,
+): HistoryState[] {
+  if (!Array.isArray(stages)) return []
+
+  const history: HistoryState[] = []
+  let lastEndMs = 0
+
+  for (const item of stages) {
+    const { stage, start, end } = item ?? {}
+    if (!stage || typeof stage !== 'string') continue
+    if (typeof start !== 'string' || typeof end !== 'string') continue
+
+    const startMs = Date.parse(start)
+    const endMs = Date.parse(end)
+    if (!(endMs > startMs)) continue
+
+    history.push({ s: stage, lc: startMs / 1000, e: endMs / 1000 })
+    lastEndMs = Math.max(lastEndMs, endMs)
+  }
+
+  if (history.length > 0) {
+    history.push({ s: trackingMapping.stopped, lc: lastEndMs / 1000 })
+  }
+
+  return history
+}
+
 export function processSleepHistory(
   rawHistory: HistoryState[],
   stateMapping: HypnogramCardStateMapping,
@@ -136,7 +166,8 @@ export function processSleepHistory(
   const sortedPoints = rawHistory
     .map((entry) => normalizeHistoryState(entry, reverseMapping))
     .filter(
-      (point): point is { state: string; timestamp: Date } => point !== null,
+      (point): point is { state: string; timestamp: Date; end?: Date } =>
+        point !== null,
     )
     .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
 
@@ -154,6 +185,7 @@ export function processSleepHistory(
       state: point.state,
       level: PHASE_LEVELS[point.state],
       timestamp: point.timestamp,
+      ...(point.end ? { end: point.end } : {}),
     }))
 
   if (points.length === 0) {
@@ -163,6 +195,7 @@ export function processSleepHistory(
         state: point.state,
         level: PHASE_LEVELS[point.state],
         timestamp: point.timestamp,
+        ...(point.end ? { end: point.end } : {}),
       }))
     sleepPeriod = sortedPoints
   }
