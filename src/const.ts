@@ -8,7 +8,7 @@ const isDev = 0
 export const CARD_NAME = `Hypnogram Card${isDev ? ' DEV' : ''}`
 export const CARD_TYPE = `hypnogram-card${isDev ? '-dev' : ''}`
 export const CARD_TYPE_EDITOR = `hypnogram-card-editor${isDev ? '-dev' : ''}`
-export const CARD_VERSION = '0.1.7'
+export const CARD_VERSION = '0.1.9'
 
 export const SLEEP_AS_ANDROID = {
   phaseLevels: {
