@@ -278,6 +278,7 @@ The card follows your Home Assistant profile language. Strings fall back to Engl
 | Language           | Code | Status    |
 | ------------------ | ---- | --------- |
 | English            | `en` | Default   |
+| German             | `de` | Supported |
 | Norwegian (Bokmål) | `nb` | Supported |
 | Swedish            | `sv` | Supported |
 

@@ -37,10 +37,11 @@ hypnogram-card/
 ├── src/
 │   ├── locales/
 │   │   ├── languages/
+│   │   │   ├── de.ts             # German localization
 │   │   │   ├── en.ts             # English localization
 │   │   │   ├── nb.ts             # Norwegian (Bokmål) localization
 │   │   │   └── sv.ts             # Swedish localization
-│   │   └── localize.ts           # i18n localization dictionary (supports 'en', 'nb', 'no', 'sv', etc.)
+│   │   └── localize.ts           # i18n localization dictionary (supports 'de', 'en', 'nb', 'no', 'sv', etc.)
 │   ├── services/
 │   │   └── history.ts            # HA WebSocket API interactions & data transforms
 │   ├── utils/
