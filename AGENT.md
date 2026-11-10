@@ -72,3 +72,4 @@ hypnogram-card/
 
 - **Build command:** `pnpm build` outputs a single unified module to `dist/hypnogram-card.js`.
 - **Format:** `pnpm run format` formats all files according to `biome.json`
+- **Release:** Bump `CARD_VERSION` in `src/const.ts` to match the GitHub release tag (console banner / bug reports use it), run `pnpm build`, commit the updated `dist/hypnogram-card.js`, then tag and publish the release from `main`.
