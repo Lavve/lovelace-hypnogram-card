@@ -44,10 +44,10 @@ The card follows your Home Assistant profile language. If a translation is missi
 
 To add a new language:
 
-1. Copy `src/locales/en.ts` to `src/locales/<code>.ts` using the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (e.g. `de.ts` for German).
+1. Copy `src/locales/languages/en.ts` to `src/locales/languages/<code>.ts` using the [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) language code (e.g. `de.ts` for German).
 2. Translate every string value. Keep the keys unchanged.
 3. Register the new locale in `src/locales/localize.ts`:
-   - import your file
+   - import it from `@/locales/languages/<code>`
    - add it to the `languages` object with the same code
 4. Run `pnpm format` and `pnpm build` to verify everything passes.
 5. Submit the PR with the language name in the title (e.g. "Add German translation").
